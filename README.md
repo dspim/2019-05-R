@@ -23,7 +23,7 @@
 (2) 在課程開始前下載並安裝 R (R-3.4.2 版本，Windows 上不建議安裝最新版)
     下載網址
     Windows: <https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/windows/base/R-3.4.2-win.exe>
-    Mac OS X: <https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.5.1.pkg>
+    Mac OS X: <https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.4.2.pkg>
     Linux: <https://cran.r-project.org/bin/linux>
 
 (3) 在課程開始前下載並安裝 RStudio (1.1.383 以上版本)
