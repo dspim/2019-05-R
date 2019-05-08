@@ -1,7 +1,7 @@
 
 ## 課程大綱
 
-1. [環境與基本語法](R-Installation-Basic/R-Installation-Basic.html)
+1. 環境與基本語法
 2. 視覺化-1
 3. 視覺化-2
 4. 資料處理-非結構化
@@ -28,10 +28,16 @@
 
 (2) 在課程開始前下載並安裝 R (R-3.4.2 版本，Windows 上不建議安裝最新版)
     下載網址
-    Windows: https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/windows/base/R-3.4.2-win.exe
-    Mac OS X: https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.5.1.pkg
-    Linux: https://cran.r-project.org/bin/linux/
+    Windows: <https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/windows/base/R-3.4.2-win.exe>
+    Mac OS X: <https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.5.1.pkg>
+    Linux: <https://cran.r-project.org/bin/linux>
 
 (3) 在課程開始前下載並安裝 RStudio (1.1.383 以上版本)
     下載網址
-    https://www.rstudio.com/products/rstudio/download/#download
+    <https://www.rstudio.com/products/rstudio/download/#download>
+    
+(4) 本次課程的投影片網址：
+
+<https://dspim.github.io/2019-05-R/>
+
+目前還在建置中，還沒有開放下載
