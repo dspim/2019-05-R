@@ -1,0 +1,35 @@
+<fortune>
+  <quote>Okay, let's stand up and be counted: who has been writing diamond graph code? Mine's 60 lines.</quote>
+  <author>Barry Rowlingson</author>
+  <context>in a discussion about the patent for diamond graphs</context>
+  <source>R-help</source>
+  <date>August 2003</date>
+</fortune>
+<fortune>
+  <quote>Bug, undocumented behaviour, feature? I don't know. It all seems to work in 1.6.0, so everyone should downgrade now... :)</quote>
+  <author>Barry Rowlingson</author>
+  <context>NA</context>
+  <source>R-help</source>
+  <date>July 2003</date>
+</fortune>
+<fortune>
+  <quote>I'm always thrilled when people discover what lexical scoping really means.</quote>
+  <author>Robert Gentleman</author>
+  <context>NA</context>
+  <source>Statistical Computing 2003, Reisensburg</source>
+  <date>June 2003</date>
+</fortune>
+<fortune>
+  <quote>My institution has a particularly diabolical policy on intellectual property, especially on software.</quote>
+  <author>Ross Ihaka</author>
+  <context>NA</context>
+  <source>R-help</source>
+  <date>August 2003</date>
+</fortune>
+<fortune>
+  <quote>If you imagine that this pen is Trellis, then Lattice is not this pen.</quote>
+  <author>Paul Murrell</author>
+  <context>on the difference of Lattice (which eventually was called grid) and Trellis</context>
+  <source>DSC 2001, Wien</source>
+  <date>March 2001</date>
+</fortune>

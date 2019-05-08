@@ -1,0 +1,372 @@
+---
+title: "非結構化的資料處理"
+author: "Wush Wu"
+date: "2019/5/8"
+output: 
+  ioslides_presentation:
+    css:
+      - unstructured-data.css
+      - ../css/dsp.css
+      - ../css/style.css
+      - ../css/wush-custom.css
+    self_contained: no
+    widescreen: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+fullimg.css <- new.env()
+fullimg <- function(path, symbol, dsr = TRUE) {
+  if (exists(symbol, envir = fullimg.css)) stop("Symbol collision")
+  if (dsr) fullimg.css[[symbol]] <- sprintf("https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s", path) else fullimg.css[[symbol]] <- path
+  sprintf(".fullimg .%s", symbol)
+}
+knitr::knit_hooks$set("document" = function(x) {
+  css <- sapply(ls(fullimg.css), function(symbol) {
+    sprintf("article.%s {\n  width : 100%%;\n  height : 80%%;\n  background : url(%s);\n  background-size : 100%% 100%%;}\n", symbol, fullimg.css[[symbol]])
+  })
+  write(css, file = "unstructured-data")
+  x
+})
+fig <- function(path, style = "max-width: 100%; max-height: 100%; ", dsr = TRUE) {
+  if (dsr) sprintf("<img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s' style='%s'></img>", path, style) else sprintf("<img src='img/%s' style='%s'></img>", path, style)
+}
+library(magrittr)
+library(dplyr)
+library(diagram)
+```
+
+## 課程大綱
+
+- 純文字的資料處理
+    - 分割與擷取
+    - 搜尋與取代
+    - 正則表示式
+- 中文資料的編碼
+- 練習
+
+# 純文字的資料處理
+
+## `strsplit`
+
+```{r}
+args(strsplit)
+strsplit("abc", "a")
+strsplit(c("abc", "baca"), "a")
+```
+
+## 利用`strsplit`搭配中括號抓取資料
+
+```{r, eval = FALSE, echo = FALSE}
+library(fortunes)
+library(XML)
+. <- lapply(1:5, fortune) %>%
+  lapply(function(.) {
+    n <- XML::newXMLNode("fortune")
+    lapply(names(.), function(name) {
+      XML::newXMLNode(name, parent = n, .children = list(XML::newXMLTextNode(.[[name]])))
+    })
+    n
+  })
+out.file = file("fortunes.xml", open = "w")
+lapply(., function(.) {
+  XML::saveXML(., file = out.file)
+  cat("\n", file = out.file, append = TRUE)
+})
+close(out.file)
+
+. <- lapply(1:250, fortune) %>%
+  lapply(function(.) {
+    n <- XML::newXMLNode("fortune")
+    lapply(names(.), function(name) {
+      XML::newXMLNode(name, parent = n, .children = list(XML::newXMLTextNode(.[[name]])))
+    })
+    n
+  })
+out.file = gzfile("fortunes250.xml.gz", open = "w")
+lapply(., function(.) {
+  XML::saveXML(., file = out.file)
+  cat("\n", file = out.file, append = TRUE)
+})
+close(out.file)
+```
+
+- 能不能利用 `strsplit` 找出 `<author>...</author>` 之間的文字？
+
+```{r, results = "asis", echo = FALSE}
+cat("```\n")
+readLines("fortunes.xml") %>%
+  cat(sep = "\n")
+cat("```\n")
+```
+
+## `strsplit`
+
+```{r}
+x <- readLines("http://homepage.ntu.edu.tw/~wush978/rdataengineer/fortunes.xml")
+. <- strsplit(x, "<author>")
+```
+
+- 在`.`中(`.`是`list`)
+    - 原文有`<author>`的字串，會被分割為長度是 2 的字串
+    - 原文沒有`<author>`的字串，長度是1
+
+```{r}
+length(.[[1]])
+length(.[[3]])
+```
+
+## `strsplit`
+
+- 寫迴圈處理
+
+```{r, eval = FALSE}
+.tokens <- c()
+for(.token in .) {
+  if (length(.token) == 2) stop("")
+}
+```
+
+- 與R互動，看看`.token`
+
+```{r}
+.tokens <- c()
+for(.token in .) {
+  if (length(.token) == 2) .tokens <- c(.tokens, .token[2])
+}
+.tokens
+```
+
+## `strsplit`
+
+- 再用`</author>`切一次
+
+```{r}
+. <- strsplit(.tokens, "</author>")
+unlist(.)
+```
+
+## 小挑戰
+
+- 請用相同的作法，找出`x`中的`<date>`與`</date>`之間的文字
+
+```{r, eval = FALSE}
+download.file(
+  "http://homepage.ntu.edu.tw/~wush978/rdataengineer/fortunes250.xml.gz",
+  destfile = .tmp.path <- tempfile(fileext = ".gz"),
+  mode = "wb"
+  )
+x250 <- readLines(.tmp.path)
+```
+
+```{r, include = FALSE}
+x250 <- readLines("fortunes250.xml.gz")
+```
+
+- 請用相同的作法，找出`x250`中的`<date>`與`</date>`之間的文字
+
+## `strsplit`的`fixed`參數
+
+```{r}
+strsplit("a.b.c", ".")
+strsplit("a.b.c", ".", fixed = TRUE)
+```
+
+- `.` 是正則表示式的特殊字元，有特殊的含意
+    - `fixed = TRUE`之後，R會忽略正則表示式
+
+## 搜尋 `grep`
+
+```{r}
+grep(pattern = "author", x)
+grep(pattern = "author", x, value = TRUE)
+grepl(pattern = "author", x)
+```
+
+## 取代 `gsub`
+
+```{r}
+(. <- grep(pattern = "author", x[1:10], value = TRUE))
+(. <- gsub(pattern = "  <author>", replacement = "", ., fixed = TRUE))
+(. <- gsub(pattern = "</author>", replacement = "", ., fixed = TRUE))
+```
+
+## 小挑戰
+
+- 怎麼用上面的方式，找出名字中包含`Paul`的人？
+- 尋找`x250`中`<author>`與`</author>`中包含Paul的人
+
+## 正則表示式：大絕招
+
+正則表示式是一種描述文字模式的語言。 它不是單純依照應用歸納出來的工具，背後具有相當的數學基礎。 正則表示式的誕生，來自於美國數學家Stephen Cole Kleene在超過半個世紀之前的研究成果：Kleene (1956)。 目前各種程式語言中，幾乎都內建正則表示式，但是他們的語法主要分成兩個派系：
+
+    一種語法出自於電機電子工程師學會(IEEE)制定的標準
+    一種語法，則來自於另一個程式語言：Perl
+
+正則表示是可以讓我們撰寫程式來自文字中比對、取代甚至是抽取各種資訊。以下我們將從簡單的應用開始介紹。
+
+## `grep` {.r-source-small}
+
+```{r}
+grep("<author>.*Paul.*</author>", x, value = TRUE)
+grep("<author>.*Paul.*</author>", x250, value = TRUE)
+```
+
+- `pattern`參數中的`"<author>.*Paul.*</author>"`
+    - `.`與`.*`是特殊字元
+    - `.`代表一個任意字元
+    - `*`代表前面的符號重複無限次
+    - `.*`代表任意長度的任意符號
+
+## 子模式(sub-pattern)，用`(`與`)`表示
+
+```{r}
+m <- regexec("<author>(.*)</author>", x)
+. <- regmatches(x, m)
+.[1:5]
+```
+## 適當的利用`sapply`化簡程式碼
+
+- 在字串處理時，常常需要對每一個list的element作挑選或計算長度
+- `sapply(., length)`可以得到每一個element的長度
+- `sapply(., "[", 2)`可以得到每一個element vector的第二個element
+
+```{r}
+(. <- .[sapply(., length) == 2])
+sapply(., "[", 2)
+```
+
+- 不熟悉的同學，仍然可以寫迴圈慢慢作
+
+## 參考閱讀
+
+- [正則表示式：文字處理的大絕招](https://datascienceandr.org/articles/RegularExpression.html)
+
+## 練習
+
+- 用正則表示式，找出x250中包含`Ripley`的那行文字
+- 尋找`x250`中`<author>`與`</author>`中包含`Ripley`的人
+- 找出所有出現過的作者，與他們的出現次數（還要用 and 做切割） 
+
+<div class="notes">
+```{r, eval = FALSE}
+grep("Ripley", x250, value = TRUE)
+grep("<author>.*Ripley.*</author>", x250, value = TRUE)
+m <- regexec("<author>(.*)</author>", x250)
+. <- regmatches(x250, m)
+. <- .[sapply(., length) >= 2]
+. <- sapply(., "[", 2)
+. <- strsplit(., split = "and")
+. <- unlist(.)
+. <- trimws(.)
+sort(table(.))
+```
+</div>
+
+## 編碼問題
+
+- 電腦的資料，最終都是0和1
+- 怎麼把一連串的0和1解讀成數字或文字？型態
+
+```{r}
+(. <- as.raw(17))
+```
+
+- 這是 0 / 1 的十六進位表示法
+- `11` 代表 `1 * 16 + 1`
+
+```{r}
+showBits <- function(r) stats::symnum(as.logical(rawToBits(r)), symbols = c("0", "1"))
+showBits(as.raw(17))
+```
+
+## 編碼問題
+
+- 一個整數在R中有4個bytes(8個0/1)
+    - 一個bytes可以用兩個16進位表示，稱為`hex code`
+
+```{r, echo = FALSE, results = "asis"}
+.symbols <- c(paste(0:9), letters[1:6])
+. <- paste(rep(.symbols, each = 8), rep(.symbols, 8), sep = "")
+.bits <- lapply(., wkb::hex2raw) %>%
+  lapply(showBits) %>%
+  sapply(paste, collapse = "")
+data.frame(int = 0:255, hex = ., bits = .bits) %>%
+  DT::datatable(rownames = FALSE, options = list(pageLength=8, scrollX='400px'), filter = 'top')
+```
+
+## `rawVector`
+
+- R的`rawVector`會用hex code來表示一連串電腦真正看到的值
+- `charToRaw`會把文字轉成代表該文字的真正的`rawVector`
+
+```{r}
+charToRaw("a")
+showBits(charToRaw("a"))
+```
+
+## `rawVector`
+
+- R的`rawVector`會用hex code來表示一連串電腦真正看到的值
+- `charToRaw`會把文字轉成代表該文字的真正的`rawVector`
+
+```{r}
+charToRaw("中") # 不同作業系統看到的結果不同
+showBits(charToRaw("中"))
+```
+
+## 把0/1變成文字的規則: ASCII(American Standard Code for Information Interchange)
+
+- 這種「把0/1轉換為文字的規則」又稱為「編碼」
+
+- `30` --> `"0"`
+- `41` --> `"A"`
+- `61` --> `"a"`
+
+## 把0/1變成中文的規則： BIG5 / UTF-8
+
+### `BIG5`
+
+- `0 0 1 0 0 1 0 1 0 0 1 0 0 1 0 1` --> `a4 a4` --> `"中"`
+- `0 0 1 0 0 1 0 1 1 0 1 0 0 1 1 1` --> `a4 e5` --> `"文"`
+
+### `UTF-8`
+
+- `0 0 1 0 0 1 1 1 0 0 0 1 1 1 0 1 1 0 1 1 0 1 0 1` --> `e4 b8 ad` --> `"中"`
+- `0 1 1 0 0 1 1 1 0 1 1 0 1 0 0 1 1 1 1 0 0 0 0 1` --> `e6 96 87` --> `"文"`
+
+## 錯誤的中文編碼
+
+- 把BIG5當成UTF-8
+
+```
+[1] "\xa4\xa4\xa4\xe5"
+```
+
+- 把UTF-8當成BIG5 (on windows)
+
+`r fig("utf-8-on-windows.png", dsr = FALSE)`
+
+## 範例
+
+<https://www.google.com/search?q=成奶j學>
+
+## R 處理編碼的機制
+
+- 原生的R，處理的不太好...
+
+```{r, eval = FALSE}
+Encoding(x) <- "UTF-8"
+x
+```
+
+- 套件`stringi`補上滿多相關功能
+- 細節在作業`RBasic-07-...`之中
+    - `stringi::stri_encode`
+
+## 作業
+
+- 請完成R語言翻轉教室 DataScienceAndR 課程的 02-RDataEngineer-01-Parsing 單元
+
