@@ -57,13 +57,13 @@ fig <- function(path, style = "max-width: 100%; max-height: 100%; ", dsr = TRUE)
     - 請教助教
     - 到[聊天室](https://gitter.im/wush978/DataScienceAndR)貼圖發問
 
-## 安裝R
+## 安裝 R
 
-- 建議安裝 3.4 版本，可以從 [MRAN Snapshot](https://mran.revolutionanalytics.com/snapshot/2017-10-12) 上下載
+- 建議安裝 3.4.2 版本，可以從 [MRAN Snapshot](https://mran.revolutionanalytics.com/snapshot/2017-10-12) 上下載
 - 依據作業系統做選擇:
     - [Windows](https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/) --> [base](https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/base/) --> [Download R 3.4.2 for Windows](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/windows/base/R-3.4.2-win.exe) --> 打開下載後的檔案並安裝
     - [Mac OS X](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/) --> [R-3.4.2.pkg](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.5.1.pkg) --> 打開下載後的檔案並安裝
-    - [Linux](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/linux/) 請參考不同distribution的安裝說明，
+    - [Linux] 請參考官方網站上不同distribution的安裝說明，
 
 ## 安裝Rstudio
 
