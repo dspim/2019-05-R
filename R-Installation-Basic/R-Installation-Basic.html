@@ -140,16 +140,16 @@ slide:not(.current) .plotly.html-widget{
 </ul></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>安裝R</h2></hgroup><article  id="r">
+</article></slide><slide class=""><hgroup><h2>安裝 R</h2></hgroup><article  id="r">
 
 <ul>
-<li>建議安裝 3.4 版本，可以從 <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12' title=''>MRAN Snapshot</a> 上下載</li>
+<li>建議安裝 3.4.2 版本，可以從 <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12' title=''>MRAN Snapshot</a> 上下載</li>
 <li>依據作業系統做選擇:
 
 <ul>
 <li><a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/' title=''>Windows</a> –&gt; <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/base/' title=''>base</a> –&gt; <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/windows/base/R-3.4.2-win.exe' title=''>Download R 3.4.2 for Windows</a> –&gt; 打開下載後的檔案並安裝</li>
 <li><a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/' title=''>Mac OS X</a> –&gt; <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.5.1.pkg' title=''>R-3.4.2.pkg</a> –&gt; 打開下載後的檔案並安裝</li>
-<li><a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/linux/' title=''>Linux</a> 請參考不同distribution的安裝說明，</li>
+<li>[Linux] 請參考官方網站上不同distribution的安裝說明，</li>
 </ul></li>
 </ul>
 
@@ -163,7 +163,7 @@ slide:not(.current) .plotly.html-widget{
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Rstudio 功能簡介</h2></hgroup><article  id="rstudio-">
 
-</article></slide><slide class=""><hgroup><h2>界面介紹</h2></hgroup><article  class="fullimg admin-with-cogwheels" id="section-2">
+</article></slide><slide class=""><hgroup><h2>界面介紹</h2></hgroup><article  id="section-2" class="fullimg admin-with-cogwheels">
 
 </article></slide><slide class=""><hgroup><h2>程式碼編輯區(1)</h2></hgroup><article  id="section-3">
 
@@ -373,7 +373,7 @@ x_1 &lt;- 1
 
 <pre >## Error in &quot;1&quot; + &quot;1&quot;: 二元運算子中有非數值引數</pre>
 
-</article></slide><slide class=""><hgroup><h2>變數 vs 字串</h2></hgroup><article  class="columns-2" id="vs-">
+</article></slide><slide class=""><hgroup><h2>變數 vs 字串</h2></hgroup><article  id="vs-" class="columns-2">
 
 <pre class = 'prettyprint lang-r'>a &lt;- 1
 plot.new()
@@ -477,7 +477,7 @@ seq(from = 1, to = 1, by = ((to - from)/(length.out - 1)),
 <li><code>...</code>是不定參數，表示函數接受額外的參數（註：除了列出的名字以外的參數）</li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>不定參數</h2></hgroup><article  class="columns-2" id="section-23">
+</article></slide><slide class=""><hgroup><h2>不定參數</h2></hgroup><article  id="section-23" class="columns-2">
 
 <h3>沒有不定參數的函數，不能接受額外的參數</h3>
 
@@ -1042,7 +1042,7 @@ attributes(.)</pre>
    &quot;children&quot; : [{&quot;name&quot; : &quot;George&quot;, &quot;age&quot; : 5}, {&quot;name&quot; : &quot;Mary&quot;, &quot;age&quot; : 3}]
 }</pre>
 
-</article></slide><slide class=""><hgroup><h2><code>[</code> 與 <code>[[</code></h2></hgroup><article  class="columns-2" id="section-48">
+</article></slide><slide class=""><hgroup><h2><code>[</code> 與 <code>[[</code></h2></hgroup><article  id="section-48" class="columns-2">
 
 <ul>
 <li><code>[</code>: 停留在parent，但是挑選<code>children</code></li>
@@ -1063,7 +1063,7 @@ attributes(.)</pre>
 
 <p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-32-1.png" width="720" /></p>
 
-</article></slide><slide class=""><hgroup><h2><code>[</code> 與 <code>[[</code></h2></hgroup><article  class="columns-2" id="section-49">
+</article></slide><slide class=""><hgroup><h2><code>[</code> 與 <code>[[</code></h2></hgroup><article  id="section-49" class="columns-2">
 
 <ul>
 <li><code>[</code>: 停留在parent，但是挑選<code>children</code></li>
@@ -1129,7 +1129,7 @@ f()</pre>
 
 <pre >## Error in f(): test error</pre>
 
-</article></slide><slide class=""><hgroup><h2>R 語言的錯誤處理： <code>try</code></h2></hgroup><article  class="columns-2" id="r--try">
+</article></slide><slide class=""><hgroup><h2>R 語言的錯誤處理： <code>try</code></h2></hgroup><article  id="r--try" class="columns-2">
 
 <pre class = 'prettyprint lang-r'>g &lt;- function() {
   f()
