@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>R語言的環境建置與基礎</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'R語言的環境建置與基礎',
+                        useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                      },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Wush Wu' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <link href="R-Installation-Basic_files/ioslides-13.5.1/fonts/fonts.css" rel="stylesheet" />
+  <link href="R-Installation-Basic_files/ioslides-13.5.1/theme/css/default.css" rel="stylesheet" />
+  <link href="R-Installation-Basic_files/ioslides-13.5.1/theme/css/phone.css" rel="stylesheet" />
+  <script src="R-Installation-Basic_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+  <script src="R-Installation-Basic_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+  <script src="R-Installation-Basic_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+  <script src="R-Installation-Basic_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+  <script src="R-Installation-Basic_files/ioslides-13.5.1/js/hammer.js"></script>
+  <script src="R-Installation-Basic_files/ioslides-13.5.1/js/slide-controller.js"></script>
+  <script src="R-Installation-Basic_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    summary {
+      display: list-item;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
+
+  </style>
+
+  <link rel="stylesheet" href="r-installation-basic.css" type="text/css" />
+  <link rel="stylesheet" href="../css/dsp.css" type="text/css" />
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../css/wush-custom.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;">2019/5/8</p>
+          </hgroup>
+  </slide>
+
+<slide class=""><hgroup><h2>課程大綱</h2></hgroup><article  id="section">
+
+<ul>
+<li>安裝R 與Rstudio</li>
+<li>Rstudio 功能簡介</li>
+<li>Expression、變數與字串</li>
+<li>函數的使用</li>
+<li>套件的使用</li>
+<li>R 語言的基礎物件與型態</li>
+<li>R 語言的錯誤處理與除錯</li>
+<li>安裝R 語言翻轉教室</li>
+<li>R Basic 系列習題解說</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>安裝R 與Rstudio</h2></hgroup><article  id="r-rstudio">
+
+</article></slide><slide class=""><hgroup><h2>事前注意事項</h2></hgroup><article  id="section-1">
+
+<ul>
+<li>檢查Windows使用者名稱是否包含中文
+
+<ul>
+<li>若包含中文，請參考：<a href='https://github.com/wush978/DataScienceAndR/wiki/Windows%E4%B8%AD%E6%96%87%E4%BD%BF%E7%94%A8%E8%80%85%E8%88%87Rstudio%E7%9A%84%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8%E8%AA%BF%E6%A0%A1' title=''>Windows中文使用者與Rstudio的環境變數調校</a></li>
+</ul></li>
+<li>有問題可以：
+
+<ul>
+<li>請教助教</li>
+<li>到<a href='https://gitter.im/wush978/DataScienceAndR' title=''>聊天室</a>貼圖發問</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>安裝R</h2></hgroup><article  id="r">
+
+<ul>
+<li>建議安裝 3.4 版本，可以從 <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12' title=''>MRAN Snapshot</a> 上下載</li>
+<li>依據作業系統做選擇:
+
+<ul>
+<li><a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/' title=''>Windows</a> –&gt; <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/base/' title=''>base</a> –&gt; <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/windows/base/R-3.4.2-win.exe' title=''>Download R 3.4.2 for Windows</a> –&gt; 打開下載後的檔案並安裝</li>
+<li><a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/' title=''>Mac OS X</a> –&gt; <a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.5.1.pkg' title=''>R-3.4.2.pkg</a> –&gt; 打開下載後的檔案並安裝</li>
+<li><a href='https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/linux/' title=''>Linux</a> 請參考不同distribution的安裝說明，</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>安裝Rstudio</h2></hgroup><article  id="rstudio">
+
+<ul>
+<li>Google &ldquo;Rstudio Download&rdquo;</li>
+<li>安裝社群版</li>
+<li><strong>Windows 基於中文編碼問題的相容性，請務必安裝</strong></li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Rstudio 功能簡介</h2></hgroup><article  id="rstudio-">
+
+</article></slide><slide class=""><hgroup><h2>界面介紹</h2></hgroup><article  class="fullimg admin-with-cogwheels" id="section-2">
+
+</article></slide><slide class=""><hgroup><h2>程式碼編輯區(1)</h2></hgroup><article  id="section-3">
+
+<ul>
+<li>主要撰寫程式碼的區域</li>
+<li>具備多種功能協助我們使用程式碼</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>語法錯誤提示</h2></hgroup><article  id="section-4">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/error-hint.gif' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>自動完成與說明文件</h2></hgroup><article  id="section-5">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/auto-completion.gif' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>對稱的括號提示</h2></hgroup><article  id="section-6">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/parantheses-match.gif' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>Console(2)</h2></hgroup><article  id="console2">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/console.gif' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>環境資訊(3)</h2></hgroup><article  id="section-7">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/Selection_037.png' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>檔案系統、說明文件與圖片(4)</h2></hgroup><article  id="section-8">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/Selection_039.png' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>檔案系統、說明文件與圖片(4)</h2></hgroup><article  id="section-9">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/Selection_042.png' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>檔案系統、說明文件與圖片(4)</h2></hgroup><article  id="section-10">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/Selection_043.png' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Expression、變數與字串</h2></hgroup><article  id="expression">
+
+</article></slide><slide class=""><hgroup><h2>學習目標</h2></hgroup><article  id="section-11">
+
+<ul>
+<li>瞭解什麼是<code>expression</code>(敘述)
+
+<ul>
+<li>建立變數(assignment)</li>
+<li>計算</li>
+<li>呼叫函數</li>
+</ul></li>
+<li>瞭解函數、參數</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2><code>expression</code></h2></hgroup><article  id="expression-1">
+
+<ul>
+<li>R 的程式是由一個又一個的expression所構成</li>
+<li>Console 會回應每一個「完整」的expression</li>
+<li>Console上的<code>&gt;</code>代表「R 正準備接受下一個expression」</li>
+<li>輸入<code>Enter</code>後，R會檢查expression有沒有結束
+
+<ul>
+<li>結束的話，就會開始進行運算</li>
+<li>沒結束的話，在下一行會出現<code>+</code>提示使用者expression尚未結束</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>運算的<code>expression</code></h2></hgroup><article  id="expression-2">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/expression1.gif' style='max-width: 100%; max-height: 100%; '></img></p>
+
+<aside class='note'><section><ul>
+<li>介紹 + - * /</li>
+</ul></section></aside>
+
+</article></slide><slide class=""><hgroup><h2>運算的<code>expression</code></h2></hgroup><article  id="expression-3">
+
+<p><img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/expression2.gif' style='max-width: 100%; max-height: 100%; '></img></p>
+
+<aside class='note'><section><ul>
+<li>先乘除後加減</li>
+<li>括號最優先: 括號是子expression</li>
+</ul></section></aside>
+
+</article></slide><slide class=""><hgroup><h2>運算的<code>expression</code></h2></hgroup><article  id="expression-4">
+
+<ul>
+<li>先乘除後加減，括號更優先</li>
+<li>Console上的<code>+</code>代表「R 認為expression沒有結束」</li>
+<li>完成expression後R 才會處理</li>
+<li><code>ESC</code>可以中斷expression</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>註解與<code>expression</code></h2></hgroup><article  id="expression-5">
+
+<ul>
+<li>輸入到console的程式碼，都會被當成expression處理</li>
+<li><code>#</code>之後的程式碼不會被處理，稱為「註解」</li>
+<li>ps. 投影片之後會用以下格式Demo程式碼的執行結果:</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>1 + 1</pre>
+
+<pre >## [1] 2</pre>
+
+<pre class = 'prettyprint lang-r'>#1 + 1</pre>
+
+</article></slide><slide class=""><hgroup><h2>運算順序 與 子<code>expression</code></h2></hgroup><article  id="expression-6">
+
+<ul>
+<li>在一個<code>expression</code>中，可能包含多個子<code>expression</code></li>
+<li>R 會依照順序做運算，並且把子<code>expression</code>的運算結果與子<code>expression</code>本身做替換</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>((( 1 + 1 ) + 1) + 1)
+((2 + 1) + 1)
+(3 + 1)
+4</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例：請問以下的<code>expression</code>會用怎樣的順序做運算？</h2></hgroup><article  id="expression-7">
+
+<ul>
+<li><code>:</code>、<code>*</code>、<code>^</code>與<code>%%</code>都是運算子</li>
+<li>可不可以與R互動找到答案？
+
+<ul>
+<li><code>??operator</code></li>
+</ul></li>
+<li>其他網路上的資源
+
+<ul>
+<li><a href='https://www.statmethods.net/management/operators.html' title=''>Operators</a></li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>3 ^ 2 * 2 + 10 %% 3</pre>
+
+</article></slide><slide class=""><hgroup><h2>變數</h2></hgroup><article  id="section-12">
+
+<ul>
+<li>變數的概念很接近數學的「未知數」
+
+<ul>
+<li>可透過<code>=</code>或<code>&lt;-</code>來建立變數</li>
+</ul></li>
+<li><code>變數的名稱 = expression</code></li>
+<li>範例：</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>y &lt;- x + 1</pre>
+
+<ul>
+<li><code>x</code> 代入 1 則 <code>y</code> 為 2</li>
+<li><code>x</code> 代入 2 則 <code>y</code> 為 3</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>變數與計算</h2></hgroup><article  id="section-13">
+
+<pre class = 'prettyprint lang-r'>x &lt;- 1
+###
+y &lt;- x + 1
+y &lt;- 1 + 1
+y &lt;- 2</pre>
+
+</article></slide><slide class=""><hgroup><h2>變數與計算</h2></hgroup><article  id="section-14">
+
+<pre class = 'prettyprint lang-r'>x &lt;- 10
+(1 + 2 * x)
+(1 + 2 * 10)</pre>
+
+</article></slide><slide class=""><hgroup><h2><a href='https://cran.r-project.org/doc/FAQ/R-FAQ.html#What-are-valid-names_003f' title=''>變數名稱的規範</a></h2></hgroup><article  id="section-15">
+
+<p>A syntactic name is a string the parser interprets as this type of expression. It consists of letters, numbers, and the dot and (for versions of R at least 1.9.0) underscore characters, and starts with either a letter or a dot not followed by a number. Reserved words are not syntactic names.</p>
+
+<ul>
+<li>不用記，問R就好</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>變數名稱的規範</h2></hgroup><article  id="section-16">
+
+<pre class = 'prettyprint lang-r'>x &lt;- 1
+.x &lt;- 1
+_x &lt;- 1
+x_1 &lt;- 1
+. &lt;- 1
+.1 &lt;- 1
+中文 &lt;- 1</pre>
+
+</article></slide><slide class=""><hgroup><h2>字串</h2></hgroup><article  id="section-17">
+
+<ul>
+<li>前後利用<code>&quot;</code>或<code>&#39;</code>所夾住的文字，在程式碼中會視為字串(character)</li>
+<li>文字的意義就是「文字」，不做運算</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>1 + 1</pre>
+
+<pre >## [1] 2</pre>
+
+<pre class = 'prettyprint lang-r'>&quot;1 + 1&quot;</pre>
+
+<pre >## [1] &quot;1 + 1&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>&quot;1&quot; + &#39;1&#39; # 文字不可相加</pre>
+
+<pre >## Error in &quot;1&quot; + &quot;1&quot;: 二元運算子中有非數值引數</pre>
+
+</article></slide><slide class=""><hgroup><h2>變數 vs 字串</h2></hgroup><article  class="columns-2" id="vs-">
+
+<pre class = 'prettyprint lang-r'>a &lt;- 1
+plot.new()
+title(main = &quot;a&quot;)</pre>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-4-1.png" width="192" /></p>
+
+<pre class = 'prettyprint lang-r'>plot.new()
+title(main = a) # 變數會有「代換」的動作</pre>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-5-1.png" width="192" /></p>
+
+</article></slide><slide class=""><hgroup><h2>函數</h2></hgroup><article  id="section-18">
+
+<pre class = 'prettyprint lang-r'>plot.new()
+title(main = &quot;a&quot;)</pre>
+
+<ul>
+<li><code>plot.new</code>、<code>title</code>等是R的函數</li>
+<li>變數代表「值」</li>
+<li>函數代表「動作」
+
+<ul>
+<li>我們可以把連續的動作取名字，當成函數</li>
+<li>例：<code>plot.new</code>代表建立一個空白的圖、<code>title</code>代表建立標題</li>
+</ul></li>
+<li>使用變數：<code>變數的名字</code></li>
+<li>呼叫函數：<code>函數的名字(...)</code></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>寫R 會運用大量的函數</h2></hgroup><article  id="r-">
+
+<ul>
+<li><a href='https://en.wikipedia.org/wiki/R_(programming_language)#Mandelbrot_set' title=''>Wiki: Mandelbrot set</a> 請同學分辨以下的expressions中的名字，哪些是變數哪些是函數？</li>
+</ul>
+
+<pre class = 'prettyprint lang-r r-source-small'>install.packages(&quot;caTools&quot;)  # install external package
+library(caTools)             # external package providing write.gif function
+jet.colors &lt;- colorRampPalette(c(&quot;red&quot;, &quot;blue&quot;, &quot;#007FFF&quot;, &quot;cyan&quot;, &quot;#7FFF7F&quot;,
+                                 &quot;yellow&quot;, &quot;#FF7F00&quot;, &quot;red&quot;, &quot;#7F0000&quot;))
+dx &lt;- 1500                    # define width
+dy &lt;- 1400                    # define height
+C  &lt;- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+C &lt;- matrix(C, dy, dx)       # reshape as square matrix of complex numbers
+Z &lt;- 0                       # initialize Z to zero
+X &lt;- array(0, c(dy, dx, 20)) # initialize output 3D array
+for (k in 1:20) {            # loop with 20 iterations
+  Z &lt;- Z^2 + C               # the central difference equation
+  X[, , k] &lt;- exp(-abs(Z))   # capture results
+}
+write.gif(X, &quot;Mandelbrot.gif&quot;, col = jet.colors, delay = 100)</pre>
+
+</article></slide><slide class=""><hgroup><h2>函數的名稱與參數</h2></hgroup><article  id="section-19">
+
+<pre class = 'prettyprint lang-r'>install.packages(&quot;caTools&quot;)  # install external package</pre>
+
+<ul>
+<li><code>install.packages</code>是函數的名字，告訴R要做什麼動作</li>
+<li><code>&quot;caTools&quot;</code>是<code>install.packages</code>的參數，告訴R 動作的細節</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>呼叫函數</h2></hgroup><article  id="section-20">
+
+<ul>
+<li>呼叫函數是一種<code>expression</code></li>
+<li>參數可以是任何的<code>expression</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>C  &lt;- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))</pre>
+
+<ul>
+<li>使用<code>complex</code>的函數時，指定了名稱為<code>real</code>與<code>imag</code>的兩個參數
+
+<ul>
+<li><code>real</code>的參數的值是<code>rep(seq(-2.2, 1.0, length.out = dx), each = dy)</code>這個<code>expression</code></li>
+<li><code>rep</code>與<code>seq</code>也都是函數</li>
+<li>這個<code>expression</code>中有三層的函數呼叫（巢狀函數）</li>
+</ul></li>
+<li>參數<code>real</code>的值中的<code>seq</code>函數的前兩個參數<code>-2.2</code>與<code>1.0</code>沒有名字，第三個參數的名字是<code>length.out</code></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>函數的定義</h2></hgroup><article  id="section-21">
+
+<pre class = 'prettyprint lang-r'>?seq</pre>
+
+<ul>
+<li><code>Usage</code>章節說明函數的定義</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>函數的定義</h2></hgroup><article  id="section-22">
+
+<pre class = 'prettyprint lang-r'>## Default S3 method:
+seq(from = 1, to = 1, by = ((to - from)/(length.out - 1)),
+    length.out = NULL, along.with = NULL, ...)</pre>
+
+<ul>
+<li>用兩種方式表示參數：<code>參數的名字</code> 或 <code>參數的名字 = 預設值</code></li>
+<li>用逗號分隔不同的參數</li>
+<li><code>...</code>是不定參數，表示函數接受額外的參數（註：除了列出的名字以外的參數）</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>不定參數</h2></hgroup><article  class="columns-2" id="section-23">
+
+<h3>沒有不定參數的函數，不能接受額外的參數</h3>
+
+<pre class = 'prettyprint lang-r'>plot.new()</pre>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-7-1.png" width="720" /></p>
+
+<pre class = 'prettyprint lang-r'>plot.new(main = &quot;a&quot;) # Error</pre>
+
+<pre >## Error in plot.new(main = &quot;a&quot;): unused argument (main = &quot;a&quot;)</pre>
+
+<h3>有不定參數的函數，接受額外的參數</h3>
+
+<pre class = 'prettyprint lang-r'>seq()</pre>
+
+<pre >## [1] 1</pre>
+
+<pre class = 'prettyprint lang-r'>seq(lalalalove = 1) # No error</pre>
+
+<pre >## Warning: In seq.default(lalalalove = 1) :
+##  extra argument &#39;lalalalove&#39; will be disregarded</pre>
+
+<pre >## [1] 1</pre>
+
+</article></slide><slide class=""><hgroup><h2>呼叫函數時，參數的比對</h2></hgroup><article  id="section-26">
+
+<ul>
+<li>有名字的參數優先比對相同名字的參數</li>
+<li>沒有名字的參數則依照順序比對剩下的參數</li>
+<li><code>seq(-2.2, 1.0, length.out = dx)</code>
+
+<ul>
+<li><code>dx</code>是<code>length.out</code>參數的值</li>
+<li><code>-2.2</code>是<code>from</code>的值</li>
+<li><code>1.0</code>是<code>to</code>的值</li>
+</ul></li>
+<li>沒比對到的參數，會使用預設值（如果有的話），否則會出現錯誤</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>mean()</pre>
+
+<pre >## Error in mean.default(): 缺少引數 &quot;x&quot;，也沒有預設值</pre>
+
+</article></slide><slide class=""><hgroup><h2>進入函數</h2></hgroup><article  id="section-27">
+
+<pre class = 'prettyprint lang-r'>debug(seq)
+seq(-2.2, 1.0, length.out = dx)</pre>
+
+<ul>
+<li>可以探索R實際上丟給函數的參數</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>呼叫函數的順序</h2></hgroup><article  id="section-28">
+
+<pre class = 'prettyprint lang-r'>dx &lt;- 1500                    # define width
+dy &lt;- 1400                    # define height
+C  &lt;- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))</pre>
+
+<ul>
+<li>在建立<code>C</code>之前，R 會先計算<code>seq</code>函數的結果，然後計算<code>rep</code>函數的結果，最後才計算<code>complex</code>函數的結果</li>
+<li>同學可以反白部份的<code>expression</code>進行檢查</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>套件的使用</h2></hgroup><article  id="section-29">
+
+</article></slide><slide class=""><hgroup><h2>套件的目的</h2></hgroup><article  id="section-30">
+
+<ul>
+<li>擴充R的功能
+
+<ul>
+<li>處理網頁的套件: <code>XML</code>、<code>xml2</code>、<code>jsonlite</code></li>
+<li>爬網站的套件: <code>httr</code></li>
+<li>跑進階分析(某篇paper的演算法)的套件: <code>supc</code></li>
+</ul></li>
+<li>整理函數
+
+<ul>
+<li>整理資料: <code>dplyr</code></li>
+<li>繪圖: <code>ggplot2</code></li>
+</ul></li>
+<li>提供資料
+
+<ul>
+<li>棒球資料: <code>Lahman</code></li>
+</ul></li>
+<li>將程式碼轉移到其他人的電腦上運作
+
+<ul>
+<li><a href='https://youtu.be/OCQU6M4pPiw' title=''>五分鐘學會「如何使用Rstudio建立R套件 」</a></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>安裝套件的<code>install.packages</code>函數</h2></hgroup><article  id="install.packages">
+
+<pre class = 'prettyprint lang-r'>?install.packages</pre>
+
+<ul>
+<li>重要的參數：<code>pkgs</code>，代表要安裝的套件的名稱
+
+<ul>
+<li><code>pkgs</code>的參數要不要加上字串</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>載入套件的<code>library</code>函數</h2></hgroup><article  id="library">
+
+<ul>
+<li>只能載入已經安裝的套件</li>
+<li>載入後才能直接使用套件的函數
+
+<ul>
+<li><code>write.gif</code>是<code>caTools</code>的函數</li>
+<li>沒載入的話，要使用<code>caTools::write.gif</code>來使用（<code>套件名稱::函數名稱</code>）</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(caTools)</pre>
+
+<ul>
+<li><strong>例外</strong>: <code>library</code>的參數不需要加上引號
+
+<ul>
+<li>技術細節：<a href='http://adv-r.had.co.nz/Computing-on-the-language.html' title=''>Advanced R: Non-standard evaluation</a></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>探索R 的世界</h2></hgroup><article  id="r--1">
+
+<p>探索套件 –&gt; 探索函數</p>
+
+<p>重現範例 –&gt; 修改範例</p>
+
+<ul>
+<li>先看套件的說明文件
+
+<ul>
+<li>套件本身的<code>DESCRIPTION</code></li>
+<li><code>vignettes</code></li>
+</ul></li>
+<li>尋找有價值的範例並重現之</li>
+<li>修改範例的時候，才需要看函數的定義與參數的用法</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>範例：學習 Mandelbrot set</h2></hgroup><article  id="mandelbrot-set">
+
+<pre class = 'prettyprint lang-r'>install.packages(&quot;caTools&quot;)  # install external package
+library(caTools)             # external package providing write.gif function
+jet.colors &lt;- colorRampPalette(c(&quot;red&quot;, &quot;blue&quot;, &quot;#007FFF&quot;, &quot;cyan&quot;, &quot;#7FFF7F&quot;,
+                                 &quot;yellow&quot;, &quot;#FF7F00&quot;, &quot;red&quot;, &quot;#7F0000&quot;))
+dx &lt;- 1500                    # define width
+dy &lt;- 1400                    # define height
+C  &lt;- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+C &lt;- matrix(C, dy, dx)       # reshape as square matrix of complex numbers
+Z &lt;- 0                       # initialize Z to zero
+X &lt;- array(0, c(dy, dx, 20)) # initialize output 3D array
+for (k in 1:20) {            # loop with 20 iterations
+  Z &lt;- Z^2 + C               # the central difference equation
+  X[, , k] &lt;- exp(-abs(Z))   # capture results
+}
+write.gif(X, &quot;Mandelbrot.gif&quot;, col = jet.colors, delay = 100)</pre>
+
+</article></slide><slide class=""><hgroup><h2>如何探索套件</h2></hgroup><article  id="section-31">
+
+<ul>
+<li>Google</li>
+<li><a href='https://cloud.r-project.org/web/views/' title=''>CRAN Task View</a></li>
+<li>增廣見聞
+
+<ul>
+<li><a href='https://www.facebook.com/groups/1210634969026548/?ref=bookmarks' title=''>台灣R軟體Club</a></li>
+<li><a href='https://www.facebook.com/groups/242102892820317/' title=''>大數俱樂部</a></li>
+<li><a href='https://www.r-bloggers.com/' title=''>R-bloggers</a></li>
+<li><a href='https://stat.ethz.ch/mailman/listinfo/r-packages' title=''>R-packages R Mailing List</a></li>
+</ul></li>
+<li>交流、問老師</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>R 語言的基礎物件與型態</h2></hgroup><article  id="r--2">
+
+</article></slide><slide class=""><hgroup><h2>R 物件</h2></hgroup><article  id="r--3">
+
+<ul>
+<li>所有的東西都是一種「R 物件」
+
+<ul>
+<li><strong>資料</strong></li>
+<li>函數</li>
+<li>環境</li>
+<li>外部指標</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>向量</h2></hgroup><article  id="section-32">
+
+<ul>
+<li>複雜的R 物件們都是由基礎的R 物件所組合的。</li>
+<li>所有的R 「資料」物件（以下簡稱R物件）都是「向量」</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>x &lt;- 1:3 # x 是一個R物件，是一個向量（不只一個值）
+x[1] # 第一個值</pre>
+
+<pre >## [1] 1</pre>
+
+<pre class = 'prettyprint lang-r'>x[2] # 第二個值</pre>
+
+<pre >## [1] 2</pre>
+
+<pre class = 'prettyprint lang-r'>length(x) # 長度</pre>
+
+<pre >## [1] 3</pre>
+
+</article></slide><slide class=""><hgroup><h2>型態</h2></hgroup><article  id="section-33">
+
+<ul>
+<li>R 的向量有以下若干種型態：
+
+<ul>
+<li><code>logical</code> 裝布林(<code>TRUE</code>/<code>FALSE</code>)的向量</li>
+<li><code>integer</code> 裝整數(4 bytes)的向量</li>
+<li><code>numeric</code> 裝浮點數(8 bytes)的向量</li>
+<li><code>character</code> 裝字串(C-style)的向量</li>
+<li><code>list</code> 裝R物件的向量</li>
+</ul></li>
+<li><code>class</code>可以查詢物件的型態、<code>str</code>可以查詢物件的結構</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-34">
+
+<pre class = 'prettyprint lang-r'>g &lt;- lm(dist ~ speed, cars)
+str(g)</pre>
+
+<pre >## List of 12
+##  $ coefficients : Named num [1:2] -17.58 3.93
+##   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;(Intercept)&quot; &quot;speed&quot;
+##  $ residuals    : Named num [1:50] 3.85 11.85 -5.95 12.05 2.12 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:50] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ effects      : Named num [1:50] -303.914 145.552 -8.115 9.885 0.194 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:50] &quot;(Intercept)&quot; &quot;speed&quot; &quot;&quot; &quot;&quot; ...
+##  $ rank         : int 2
+##  $ fitted.values: Named num [1:50] -1.85 -1.85 9.95 9.95 13.88 ...
+##   ..- attr(*, &quot;names&quot;)= chr [1:50] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ assign       : int [1:2] 0 1
+##  $ qr           :List of 5
+##   ..$ qr   : num [1:50, 1:2] -7.071 0.141 0.141 0.141 0.141 ...
+##   .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. ..$ : chr [1:50] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##   .. .. ..$ : chr [1:2] &quot;(Intercept)&quot; &quot;speed&quot;
+##   .. ..- attr(*, &quot;assign&quot;)= int [1:2] 0 1
+##   ..$ qraux: num [1:2] 1.14 1.27
+##   ..$ pivot: int [1:2] 1 2
+##   ..$ tol  : num 1e-07
+##   ..$ rank : int 2
+##   ..- attr(*, &quot;class&quot;)= chr &quot;qr&quot;
+##  $ df.residual  : int 48
+##  $ xlevels      : Named list()
+##  $ call         : language lm(formula = dist ~ speed, data = cars)
+##  $ terms        :Classes &#39;terms&#39;, &#39;formula&#39;  language dist ~ speed
+##   .. ..- attr(*, &quot;variables&quot;)= language list(dist, speed)
+##   .. ..- attr(*, &quot;factors&quot;)= int [1:2, 1] 0 1
+##   .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. .. ..$ : chr [1:2] &quot;dist&quot; &quot;speed&quot;
+##   .. .. .. ..$ : chr &quot;speed&quot;
+##   .. ..- attr(*, &quot;term.labels&quot;)= chr &quot;speed&quot;
+##   .. ..- attr(*, &quot;order&quot;)= int 1
+##   .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. ..- attr(*, &quot;predvars&quot;)= language list(dist, speed)
+##   .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:2] &quot;numeric&quot; &quot;numeric&quot;
+##   .. .. ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;dist&quot; &quot;speed&quot;
+##  $ model        :&#39;data.frame&#39;:   50 obs. of  2 variables:
+##   ..$ dist : num [1:50] 2 10 4 22 16 10 18 26 34 17 ...
+##   ..$ speed: num [1:50] 4 4 7 7 8 9 10 10 10 11 ...
+##   ..- attr(*, &quot;terms&quot;)=Classes &#39;terms&#39;, &#39;formula&#39;  language dist ~ speed
+##   .. .. ..- attr(*, &quot;variables&quot;)= language list(dist, speed)
+##   .. .. ..- attr(*, &quot;factors&quot;)= int [1:2, 1] 0 1
+##   .. .. .. ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. .. .. .. ..$ : chr [1:2] &quot;dist&quot; &quot;speed&quot;
+##   .. .. .. .. ..$ : chr &quot;speed&quot;
+##   .. .. ..- attr(*, &quot;term.labels&quot;)= chr &quot;speed&quot;
+##   .. .. ..- attr(*, &quot;order&quot;)= int 1
+##   .. .. ..- attr(*, &quot;intercept&quot;)= int 1
+##   .. .. ..- attr(*, &quot;response&quot;)= int 1
+##   .. .. ..- attr(*, &quot;.Environment&quot;)=&lt;environment: R_GlobalEnv&gt; 
+##   .. .. ..- attr(*, &quot;predvars&quot;)= language list(dist, speed)
+##   .. .. ..- attr(*, &quot;dataClasses&quot;)= Named chr [1:2] &quot;numeric&quot; &quot;numeric&quot;
+##   .. .. .. ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;dist&quot; &quot;speed&quot;
+##  - attr(*, &quot;class&quot;)= chr &quot;lm&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>向量化的運算</h2></hgroup><article  id="section-35">
+
+<ul>
+<li>R 內建迴圈</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>x &lt;- 1:3 # `:` 可以快速產生序列，`1:3` 代表從1至3間隔為1的數列
+y &lt;- 2:4
+x + y</pre>
+
+<pre >## [1] 3 5 7</pre>
+
+<h3>範例：如何快速判斷<code>p</code>是不是質數</h3>
+
+<pre class = 'prettyprint lang-r'>p &lt;- 257
+. &lt;- 2:(p-1) # 2 和 p-1之間的所有整數
+# 檢查他們是不是p的因數（餘數為0）
+. &lt;- p %% . # 計算餘數
+. &lt;- . == 0 # 拿餘數與0比較
+any(.) # 有沒有任何的因數，有因數的話p就不是值數</pre>
+
+<pre >## [1] FALSE</pre>
+
+<pre class = 'prettyprint lang-r'># which(.) # 看看那一個是因數</pre>
+
+</article></slide><slide class=""><hgroup><h2>向量化的對齊</h2></hgroup><article  id="section-36">
+
+<pre class = 'prettyprint lang-r'>x &lt;- 1:3
+y &lt;- 1:6
+x + y # R會重複比較短的向量，補到一樣長之後再做運算</pre>
+
+<pre >## [1] 2 4 6 5 7 9</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>[</code>的操作</h2></hgroup><article  id="section-37">
+
+<ul>
+<li><code>[</code>可以從向量中讀出特定的資料</li>
+<li><code>[</code>是一種特別的函數
+
+<ul>
+<li>第一個參數在<code>[</code>的左邊</li>
+<li>其他參數在<code>[</code>與<code>]</code>之間</li>
+<li>參數有不同的型態，會有不同的效果</li>
+<li><code>[</code> 可以與 <code>&lt;-</code>或<code>=</code>搭配，修改向量的值</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2><code>[</code> + 數值向量</h2></hgroup><article  id="section-38">
+
+<ul>
+<li><code>x[1]</code>會從<code>x</code>中取出第一個位置的元素</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>x &lt;- 1:3
+x[1]</pre>
+
+<pre >## [1] 1</pre>
+
+<pre class = 'prettyprint lang-r'>x[1:2]</pre>
+
+<pre >## [1] 1 2</pre>
+
+<pre class = 'prettyprint lang-r'>x[-2]</pre>
+
+<pre >## [1] 1 3</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>[</code> + 布林向量</h2></hgroup><article  id="section-39">
+
+<ul>
+<li><code>x[c(T, F, T)]</code>會取出對應位置為<code>T</code>的位置的元素</li>
+<li>常見於條件篩選</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>set.seed(1)
+x &lt;- rnorm(10) # 10000個標準常態分佈的隨機亂數
+x[x &gt; 1] # 超過1的元素</pre>
+
+<pre >## [1] 1.595281</pre>
+
+<pre class = 'prettyprint lang-r'>x[x &gt; -1 &amp; x &lt; 1] # 1 與 -1 之間的元素</pre>
+
+<pre >## [1] -0.6264538  0.1836433 -0.8356286  0.3295078 -0.8204684  0.4874291
+## [7]  0.7383247  0.5757814 -0.3053884</pre>
+
+<pre class = 'prettyprint lang-r'>y &lt;- rnorm(10)
+x[y &gt; 1] # 那些y超過1的對應位置的x</pre>
+
+<pre >## [1] -0.6264538  0.3295078</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>[</code> + 字串向量</h2></hgroup><article  id="section-40">
+
+<pre class = 'prettyprint lang-r'>x &lt;- 1:26
+names(x) &lt;- letters
+x[&quot;n&quot;]</pre>
+
+<pre >##  n 
+## 14</pre>
+
+<pre class = 'prettyprint lang-r'>x[c(&quot;n&quot;, &quot;w&quot;, &quot;w&quot;, &quot;a&quot;)]</pre>
+
+<pre >##  n  w  w  a 
+## 14 23 23  1</pre>
+
+</article></slide><slide class=""><hgroup><h2>關於<code>[</code></h2></hgroup><article  id="section-41">
+
+<ul>
+<li><code>x[...]</code>一定與<code>x</code>會是相同的型態</li>
+<li><code>[</code>的效果與<code>x</code>的型態無關，與<code>[]</code>之間的物件的型態有關</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>安裝R 語言翻轉教室</h2></hgroup><article  id="r--4">
+
+</article></slide><slide class=""><hgroup><h2>一行指令安裝做作業的系統</h2></hgroup><article  id="section-42">
+
+<pre class = 'prettyprint lang-r'>source(&quot;http://homepage.ntu.edu.tw/~wush978/R/init-swirl.R&quot;)</pre>
+
+<ul>
+<li>DataScienceAndR中有許多的單元，是我們的作業主要來源</li>
+<li>上課沒教到的部份（細節），同學要在作業中學習</li>
+<li>還會需要額外的指令安裝其他題目</li>
+<li>疑難排解： <a href='https://gitter.im/wush978/DataScienceAndR' title=''>https://gitter.im/wush978/DataScienceAndR</a></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>這周請同學完成：</h2></hgroup><article  id="section-43">
+
+<ul>
+<li>00-Hello-DataScienceAndR</li>
+<li>01-RBasic-01-Introduction</li>
+<li>01-RBasic-02-Data-Structure-Vectors</li>
+<li>01-RBasic-03-Data-Structure-Object</li>
+<li>01-RBasic-04-Factors</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2><code>list</code></h2></hgroup><article  id="list">
+
+<ul>
+<li>R 物件的向量
+
+<ul>
+<li>element 可以是各種向量、函數、環境…</li>
+</ul></li>
+<li>需要使用<code>[[</code>或<code>$</code>才能接觸到裝載的向量</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>g &lt;- lm(dist ~ speed, cars)
+g[[1]]</pre>
+
+<pre >## (Intercept)       speed 
+##  -17.579095    3.932409</pre>
+
+<pre class = 'prettyprint lang-r'>g$coefficients</pre>
+
+<pre >## (Intercept)       speed 
+##  -17.579095    3.932409</pre>
+
+</article></slide><slide class=""><hgroup><h2>學習如何從console的輸出充判斷一般的向量與<code>list</code></h2></hgroup><article  id="consolelist">
+
+<pre class = 'prettyprint lang-r'>g[1]</pre>
+
+<pre >## $coefficients
+## (Intercept)       speed 
+##  -17.579095    3.932409</pre>
+
+<pre class = 'prettyprint lang-r'>list(g[[1]])</pre>
+
+<pre >## [[1]]
+## (Intercept)       speed 
+##  -17.579095    3.932409</pre>
+
+<pre class = 'prettyprint lang-r'>g[[1]]</pre>
+
+<pre >## (Intercept)       speed 
+##  -17.579095    3.932409</pre>
+
+</article></slide><slide class=""><hgroup><h2>屬性</h2></hgroup><article  id="section-44">
+
+<ul>
+<li>R 物件的屬性是一個「有名字的<code>list</code>」</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- g[[1]]
+attributes(.)</pre>
+
+<pre >## $names
+## [1] &quot;(Intercept)&quot; &quot;speed&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>str(.)</pre>
+
+<pre >##  Named num [1:2] -17.58 3.93
+##  - attr(*, &quot;names&quot;)= chr [1:2] &quot;(Intercept)&quot; &quot;speed&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>利用<code>str</code>了解R 物件的結構</h2></hgroup><article  id="strr-">
+
+<pre class = 'prettyprint lang-r'>str(g[1])</pre>
+
+<pre >## List of 1
+##  $ coefficients: Named num [1:2] -17.58 3.93
+##   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;(Intercept)&quot; &quot;speed&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>list</code> 與樹狀結構</h2></hgroup><article  id="list-">
+
+<h3>樹狀結構</h3>
+
+<ul>
+<li>除了root，每個node都有一個<strong>唯一的</strong>parent node
+
+<ul>
+<li><code>parent ---&gt; children</code></li>
+</ul></li>
+<li>root的parent是空</li>
+</ul>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-24-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2><code>list</code> 與樹狀結構</h2></hgroup><article  id="list--1">
+
+<ul>
+<li>這是不是樹狀結構?</li>
+</ul>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-25-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2><code>list</code> 與樹狀結構</h2></hgroup><article  id="list--2">
+
+<ul>
+<li>這是不是樹狀結構?</li>
+</ul>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-26-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2><code>list</code> 與樹狀結構</h2></hgroup><article  id="list--3">
+
+<ul>
+<li>這是不是樹狀結構?</li>
+</ul>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-27-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2><code>list</code> 與樹狀結構</h2></hgroup><article  id="list--4">
+
+<ul>
+<li><code>list</code> 可以視為建立一個R物件之間的樹狀結構</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>list(2, 3, 4, 5)</pre>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-28-1.png" width="720" /> ## <code>list</code> 與樹狀結構</p>
+
+<pre class = 'prettyprint lang-r'>x &lt;- list(&quot;2&quot; = list(5, 6, 7), &quot;3&quot; = list(8, 9, 10), &quot;4&quot; = list(11, 12, 13))</pre>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-30-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>樹狀結構常見於半結構化的資料</h2></hgroup><article  id="section-46">
+
+<ul>
+<li>XML</li>
+<li>JSON</li>
+</ul>
+
+<h3>原因</h3>
+
+<ul>
+<li>透過樹狀結構，可以讓資料之間的關係結構化，讓電腦處理</li>
+</ul>
+
+<pre class = 'prettyprint lang-sh'>{
+   &quot;name&quot; : &quot;Peter&quot;,
+   &quot;age&quot; : 35
+   &quot;children&quot; : [{&quot;name&quot; : &quot;George&quot;, &quot;age&quot; : 5}, {&quot;name&quot; : &quot;Mary&quot;, &quot;age&quot; : 3}]
+}</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>[</code> 與 <code>[[</code></h2></hgroup><article  class="columns-2" id="section-48">
+
+<ul>
+<li><code>[</code>: 停留在parent，但是挑選<code>children</code></li>
+<li><code>[[</code>: 往<code>children</code>走</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>x[1] </pre>
+
+<pre >## $`2`
+## $`2`[[1]]
+## [1] 5
+## 
+## $`2`[[2]]
+## [1] 6
+## 
+## $`2`[[3]]
+## [1] 7</pre>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-32-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2><code>[</code> 與 <code>[[</code></h2></hgroup><article  class="columns-2" id="section-49">
+
+<ul>
+<li><code>[</code>: 停留在parent，但是挑選<code>children</code></li>
+<li><code>[[</code>: 往<code>children</code>走</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>x[[1]] # x$`2`</pre>
+
+<pre >## [[1]]
+## [1] 5
+## 
+## [[2]]
+## [1] 6
+## 
+## [[3]]
+## [1] 7</pre>
+
+<p><img src="R-Installation-Basic_files/figure-html/unnamed-chunk-34-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>Factor 利用屬性實作的物件</h2></hgroup><article  id="factor-">
+
+<ul>
+<li>常用於取代字串<code>character</code>型態</li>
+<li>產生<code>data.frame</code>時（R 常用的，處理結構化資料的物件）會自動轉換字串為<code>factor</code>型態</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>x &lt;- iris$Species # 內建的結構化資料集
+str(x)</pre>
+
+<pre >##  Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</pre>
+
+<pre class = 'prettyprint lang-r'>attributes(x)</pre>
+
+<pre >## $levels
+## [1] &quot;setosa&quot;     &quot;versicolor&quot; &quot;virginica&quot; 
+## 
+## $class
+## [1] &quot;factor&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>Factor</h2></hgroup><article  id="factor">
+
+<pre class = 'prettyprint lang-r'>attributes(x) &lt;- NULL
+str(x)</pre>
+
+<pre >##  int [1:150] 1 1 1 1 1 1 1 1 1 1 ...</pre>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>R 語言的錯誤處理與除錯</h2></hgroup><article  id="r--5">
+
+</article></slide><slide class=""><hgroup><h2>R 語言的錯誤處理</h2></hgroup><article  id="r--6">
+
+<ul>
+<li>Error 機制會中斷所有處理程序，除非被處理</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>f &lt;- function() {
+  print(1) # 正常執行
+  stop(&quot;test error&quot;) # `stop` 拋出 condition 物件，中斷`f`的運作
+  print(2) # `f`被中斷了，不會被執行
+}
+f()</pre>
+
+<pre >## [1] 1</pre>
+
+<pre >## Error in f(): test error</pre>
+
+</article></slide><slide class=""><hgroup><h2>R 語言的錯誤處理： <code>try</code></h2></hgroup><article  class="columns-2" id="r--try">
+
+<pre class = 'prettyprint lang-r'>g &lt;- function() {
+  f()
+  print(3) # 不會被執行
+}
+g()</pre>
+
+<pre >## [1] 1</pre>
+
+<pre >## Error in f(): test error</pre>
+
+<pre class = 'prettyprint lang-r'>g &lt;- function() {
+  try(f(), silent = TRUE) # 處理錯誤後，會繼續執行`g`
+  print(3) # 
+}
+g()</pre>
+
+<pre >## [1] 1
+## [1] 3</pre>
+
+</article></slide><slide class=""><hgroup><h2>R 語言的錯誤處理： <code>try</code></h2></hgroup><article  id="r--try-1">
+
+<ul>
+<li><code>try</code>在錯誤發生時，會傳回一個型態為<code>try-error</code>的物件，讓使用者判斷有無發生錯誤</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>r &lt;- try(f(), silent = TRUE)</pre>
+
+<pre >## [1] 1</pre>
+
+<pre class = 'prettyprint lang-r'>class(r) # 可以藉此判斷錯誤有沒有發生</pre>
+
+<pre >## [1] &quot;try-error&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>conditionMessage(attr(r, &quot;condition&quot;)) # 可以取得呼叫`stop`時傳入的字串</pre>
+
+<pre >## [1] &quot;test error&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>r &lt;- try({}, silent = TRUE)
+class(r) # 不再是`try-error`</pre>
+
+<pre >## [1] &quot;NULL&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>R 語言的錯誤處理： <code>tryCatch</code></h2></hgroup><article  id="r--trycatch">
+
+<ul>
+<li>類似現代語言的<code>try</code> - <code>catch</code> - <code>finally</code> 的錯誤處理機制。</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>tryCatch({
+  # 進入 try-catch block 的程式碼
+  f()
+}, error = function(e) {
+  # `e`就是捕捉到的錯誤（condition 物件）
+  print(conditionMessage(e)) # 印出錯誤訊息
+}, finally = {
+  # 無論有沒有錯誤都一定會執行的程式碼
+})</pre>
+
+<pre >## [1] 1
+## [1] &quot;test error&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>巢狀函數的除錯</h2></hgroup><article  id="section-50">
+
+<ul>
+<li>初學者不要使用巢狀函數</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>C  &lt;- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))</pre>
+
+<ul>
+<li>請問，<code>each = dy</code>是哪個函數的參數？（不明顯，容易誤判）</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>巢狀函數的除錯</h2></hgroup><article  id="section-51">
+
+<ul>
+<li>遇到錯誤時，把巢狀函數用變數展開
+
+<ul>
+<li>找錯誤的重點在縮小錯誤可能發生的範圍</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- seq(-2.2, 1.0, length.out = dx)
+.real &lt;- rep(., each = dy)
+. &lt;- seq(-1.2, 1.2, length.out = dy)
+.imag &lt;- rep(., dx)
+C  &lt;- complex(real = .real, imag = .imag)</pre>
+
+<ul>
+<li>透過一行一行的執行，快速掌握是那一個函數的運作出錯</li>
+<li>參數的誤值會很明顯</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>除錯器</h2></hgroup><article  id="section-52">
+
+<ul>
+<li><code>browser()</code>，產生中斷點</li>
+<li><code>debug(f)</code>，在<code>f</code>函數的開頭插入中斷點。可透過<code>undebug</code>移除一開始的中斷點
+
+<ul>
+<li><code>f</code> 可以是內建，或是套件提供的函數</li>
+</ul></li>
+<li><code>trace</code> 可以暫時編輯一個函數的程式碼。（搭配<code>browser</code>使用），請看現場demo</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>除錯器</h2></hgroup><article  id="section-53">
+
+<pre class = 'prettyprint lang-r'>f &lt;- function(a, ...) {
+  browser()
+}
+f(1, b = 2, 3)</pre>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>安裝R 語言翻轉教室</h2></hgroup><article  id="r--7">
+
+</article></slide><slide class=""><hgroup><h2>R 語言翻轉教室</h2></hgroup><article  id="r--8">
+
+<ul>
+<li>我用swirl（也變成共同作者了）寫出來的「在R學R」的「學習環境」
+
+<ul>
+<li>為什麼要「在R學R」?</li>
+</ul></li>
+<li>協助我掌握同學們的進度</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>安裝R 語言翻轉教室</h2></hgroup><article  id="r--9">
+
+<ul>
+<li>懶人包：執行 <code>source(&quot;https://wush978.github.io/R/init-swirl.R&quot;)</code></li>
+<li>逐步執行的截圖，請參閱官方網站的<a href='https://datascienceandr.org/install' title=''>安裝區</a></li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>R Basic 系列習題解說</h2></hgroup><article  id="r-basic-">
+
+</article></slide><slide class=""><hgroup><h2>大魔王</h2></hgroup><article  id="section-54">
+
+<ul>
+<li>每個課程的最後，都會有一個難度較高的關卡</li>
+<li><a href='http://datascienceandr.org/material.html#2' title=''>課程筆記</a>有每一個問題的問答，與大魔王的參考解答
+
+<ul>
+<li>忘記的同學可以利用這個區域做複習</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>現場解說</h2></hgroup><article  id="section-55">
+
+</article></slide><slide class=""><hgroup><h2>Q&amp;A</h2></hgroup><article  id="qa"></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,946 @@
+---
+title: "R語言的環境建置與基礎"
+author: "Wush Wu"
+date: "2019/5/8"
+output: 
+  ioslides_presentation:
+    css:
+      - r-installation-basic.css
+      - ../css/dsp.css
+      - ../css/style.css
+      - ../css/wush-custom.css
+    self_contained: no
+    widescreen: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+fullimg.css <- new.env()
+fullimg <- function(path, symbol, dsr = TRUE) {
+  if (exists(symbol, envir = fullimg.css)) stop("Symbol collision")
+  if (dsr) fullimg.css[[symbol]] <- sprintf("https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s", path) else fullimg.css[[symbol]] <- path
+  sprintf(".fullimg .%s", symbol)
+}
+knitr::knit_hooks$set("document" = function(x) {
+  css <- sapply(ls(fullimg.css), function(symbol) {
+    sprintf("article.%s {\n  width : 100%%;\n  height : 80%%;\n  background : url(%s);\n  background-size : 100%% 100%%;}\n", symbol, fullimg.css[[symbol]])
+  })
+  write(css, file = "r-installation-basic.css")
+  x
+})
+fig <- function(path, style = "max-width: 100%; max-height: 100%; ", dsr = TRUE) {
+  if (dsr) sprintf("<img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s' style='%s'></img>", path, style) else sprintf("<img src='img/%s' style='%s'></img>", path, style)
+}
+```
+
+## 課程大綱
+
+- 安裝R 與Rstudio
+- Rstudio 功能簡介
+- Expression、變數與字串
+- 函數的使用
+- 套件的使用
+- R 語言的基礎物件與型態
+- R 語言的錯誤處理與除錯
+- 安裝R 語言翻轉教室
+- R Basic 系列習題解說
+
+# 安裝R 與Rstudio
+
+## 事前注意事項
+
+- 檢查Windows使用者名稱是否包含中文
+    - 若包含中文，請參考：[Windows中文使用者與Rstudio的環境變數調校](https://github.com/wush978/DataScienceAndR/wiki/Windows%E4%B8%AD%E6%96%87%E4%BD%BF%E7%94%A8%E8%80%85%E8%88%87Rstudio%E7%9A%84%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8%E8%AA%BF%E6%A0%A1)
+- 有問題可以：
+    - 請教助教
+    - 到[聊天室](https://gitter.im/wush978/DataScienceAndR)貼圖發問
+
+## 安裝R
+
+- 建議安裝 3.4 版本，可以從 [MRAN Snapshot](https://mran.revolutionanalytics.com/snapshot/2017-10-12) 上下載
+- 依據作業系統做選擇:
+    - [Windows](https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/) --> [base](https://mran.revolutionanalytics.com/snapshot/2017-10-12/windows/base/) --> [Download R 3.4.2 for Windows](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/windows/base/R-3.4.2-win.exe) --> 打開下載後的檔案並安裝
+    - [Mac OS X](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/) --> [R-3.4.2.pkg](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/macosx/R-3.5.1.pkg) --> 打開下載後的檔案並安裝
+    - [Linux](https://mran.revolutionanalytics.com/snapshot/2017-10-12/bin/linux/) 請參考不同distribution的安裝說明，
+
+## 安裝Rstudio
+
+- Google "Rstudio Download"
+- 安裝社群版
+- **Windows 基於中文編碼問題的相容性，請務必安裝**
+
+# Rstudio 功能簡介
+
+## 界面介紹 {`r fullimg("Workspace1_036.png", "admin-with-cogwheels")`}
+
+## 程式碼編輯區(1)
+
+- 主要撰寫程式碼的區域
+- 具備多種功能協助我們使用程式碼
+
+## 語法錯誤提示
+
+`r fig("error-hint.gif")`
+
+## 自動完成與說明文件
+
+`r fig("auto-completion.gif")`
+
+## 對稱的括號提示
+
+`r fig("parantheses-match.gif")`
+
+## Console(2)
+
+`r fig("console.gif")`
+
+## 環境資訊(3)
+
+`r fig("Selection_037.png")`
+
+## 檔案系統、說明文件與圖片(4)
+
+`r fig("Selection_039.png")`
+
+## 檔案系統、說明文件與圖片(4)
+
+`r fig("Selection_042.png")`
+
+## 檔案系統、說明文件與圖片(4)
+
+`r fig("Selection_043.png")`
+
+# Expression、變數與字串
+
+## 學習目標
+
+- 瞭解什麼是`expression`(敘述)
+    - 建立變數(assignment)
+    - 計算
+    - 呼叫函數
+- 瞭解函數、參數
+
+## `expression`
+
+- R 的程式是由一個又一個的expression所構成
+- Console 會回應每一個「完整」的expression
+- Console上的`>`代表「R 正準備接受下一個expression」
+- 輸入`Enter`後，R會檢查expression有沒有結束
+    - 結束的話，就會開始進行運算
+    - 沒結束的話，在下一行會出現`+`提示使用者expression尚未結束
+
+## 運算的`expression`
+
+`r fig("expression1.gif")`
+
+<div class="notes">
+
+- 介紹 + - * /
+
+</div>
+
+## 運算的`expression`
+
+`r fig("expression2.gif")`
+
+<div class="notes">
+
+- 先乘除後加減
+- 括號最優先: 括號是子expression
+
+</div>
+
+## 運算的`expression`
+
+- 先乘除後加減，括號更優先
+- Console上的`+`代表「R 認為expression沒有結束」
+- 完成expression後R 才會處理
+- `ESC`可以中斷expression
+
+## 註解與`expression`
+
+- 輸入到console的程式碼，都會被當成expression處理
+- `#`之後的程式碼不會被處理，稱為「註解」
+- ps. 投影片之後會用以下格式Demo程式碼的執行結果:
+
+```{r}
+1 + 1
+#1 + 1
+```
+
+## 運算順序 與 子`expression`
+
+- 在一個`expression`中，可能包含多個子`expression`
+- R 會依照順序做運算，並且把子`expression`的運算結果與子`expression`本身做替換
+
+```r
+((( 1 + 1 ) + 1) + 1)
+((2 + 1) + 1)
+(3 + 1)
+4
+```
+
+## 範例：請問以下的`expression`會用怎樣的順序做運算？
+
+- `:`、`*`、`^`與`%%`都是運算子
+- 可不可以與R互動找到答案？
+    - `??operator`
+- 其他網路上的資源
+    - [Operators](https://www.statmethods.net/management/operators.html)
+    
+```r
+3 ^ 2 * 2 + 10 %% 3
+```
+
+## 變數
+
+- 變數的概念很接近數學的「未知數」
+    - 可透過`=`或`<-`來建立變數
+- `變數的名稱 = expression`
+- 範例：
+
+```r
+y <- x + 1
+```
+
+- `x` 代入 1 則 `y` 為 2
+- `x` 代入 2 則 `y` 為 3
+
+## 變數與計算
+
+```r
+x <- 1
+###
+y <- x + 1
+y <- 1 + 1
+y <- 2
+```
+
+## 變數與計算
+
+```r
+x <- 10
+(1 + 2 * x)
+(1 + 2 * 10)
+```
+
+## [變數名稱的規範](https://cran.r-project.org/doc/FAQ/R-FAQ.html#What-are-valid-names_003f)
+
+A syntactic name is a string the parser interprets as this type of expression. It consists of letters, numbers, and the dot and (for versions of R at least 1.9.0) underscore characters, and starts with either a letter or a dot not followed by a number. Reserved words are not syntactic names.
+
+- 不用記，問R就好
+
+## 變數名稱的規範
+
+```{r, eval = FALSE}
+x <- 1
+.x <- 1
+_x <- 1
+x_1 <- 1
+. <- 1
+.1 <- 1
+中文 <- 1
+```
+
+## 字串
+
+- 前後利用`"`或`'`所夾住的文字，在程式碼中會視為字串(character)
+- 文字的意義就是「文字」，不做運算
+
+```{r, error = TRUE}
+1 + 1
+"1 + 1"
+"1" + '1' # 文字不可相加
+```
+
+## 變數 vs 字串 {.columns-2}
+
+```{r, fig.width = 2, fig.height = 2}
+a <- 1
+plot.new()
+title(main = "a")
+```
+
+```{r, fig.width = 2, fig.height = 2}
+plot.new()
+title(main = a) # 變數會有「代換」的動作
+```
+
+## 函數
+
+```r
+plot.new()
+title(main = "a")
+```
+
+- `plot.new`、`title`等是R的函數
+- 變數代表「值」
+- 函數代表「動作」
+    - 我們可以把連續的動作取名字，當成函數
+    - 例：`plot.new`代表建立一個空白的圖、`title`代表建立標題
+- 使用變數：`變數的名字`
+- 呼叫函數：`函數的名字(...)`
+
+## 寫R 會運用大量的函數
+
+- [Wiki: Mandelbrot set](https://en.wikipedia.org/wiki/R_(programming_language)#Mandelbrot_set) 請同學分辨以下的expressions中的名字，哪些是變數哪些是函數？
+
+```{r, eval = FALSE, class.source = "r-source-small"}
+install.packages("caTools")  # install external package
+library(caTools)             # external package providing write.gif function
+jet.colors <- colorRampPalette(c("red", "blue", "#007FFF", "cyan", "#7FFF7F",
+                                 "yellow", "#FF7F00", "red", "#7F0000"))
+dx <- 1500                    # define width
+dy <- 1400                    # define height
+C  <- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+C <- matrix(C, dy, dx)       # reshape as square matrix of complex numbers
+Z <- 0                       # initialize Z to zero
+X <- array(0, c(dy, dx, 20)) # initialize output 3D array
+for (k in 1:20) {            # loop with 20 iterations
+  Z <- Z^2 + C               # the central difference equation
+  X[, , k] <- exp(-abs(Z))   # capture results
+}
+write.gif(X, "Mandelbrot.gif", col = jet.colors, delay = 100)
+```
+
+## 函數的名稱與參數
+
+```r
+install.packages("caTools")  # install external package
+```
+
+- `install.packages`是函數的名字，告訴R要做什麼動作
+- `"caTools"`是`install.packages`的參數，告訴R 動作的細節
+
+## 呼叫函數
+
+- 呼叫函數是一種`expression`
+- 參數可以是任何的`expression`
+
+```r
+C  <- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+```
+
+- 使用`complex`的函數時，指定了名稱為`real`與`imag`的兩個參數
+    - `real`的參數的值是`rep(seq(-2.2, 1.0, length.out = dx), each = dy)`這個`expression`
+    - `rep`與`seq`也都是函數
+    - 這個`expression`中有三層的函數呼叫（巢狀函數）
+- 參數`real`的值中的`seq`函數的前兩個參數`-2.2`與`1.0`沒有名字，第三個參數的名字是`length.out`
+
+## 函數的定義
+
+```r
+?seq
+```
+
+- `Usage`章節說明函數的定義
+
+## 函數的定義
+
+```r
+## Default S3 method:
+seq(from = 1, to = 1, by = ((to - from)/(length.out - 1)),
+    length.out = NULL, along.with = NULL, ...)
+```
+
+- 用兩種方式表示參數：`參數的名字` 或 `參數的名字 = 預設值`
+- 用逗號分隔不同的參數
+- `...`是不定參數，表示函數接受額外的參數（註：除了列出的名字以外的參數）
+
+## 不定參數 {.columns-2}
+
+### 沒有不定參數的函數，不能接受額外的參數
+
+```{r, error = TRUE, fig.height = 2}
+plot.new()
+plot.new(main = "a") # Error
+```
+
+### 有不定參數的函數，接受額外的參數
+
+```{r, error = TRUE}
+seq()
+seq(lalalalove = 1) # No error
+```
+
+## 呼叫函數時，參數的比對
+
+- 有名字的參數優先比對相同名字的參數
+- 沒有名字的參數則依照順序比對剩下的參數
+- `seq(-2.2, 1.0, length.out = dx)`
+    - `dx`是`length.out`參數的值
+    - `-2.2`是`from`的值
+    - `1.0`是`to`的值
+- 沒比對到的參數，會使用預設值（如果有的話），否則會出現錯誤
+
+```{r, error = TRUE}
+mean()
+```
+
+## 進入函數
+
+```{r, eval = FALSE}
+debug(seq)
+seq(-2.2, 1.0, length.out = dx)
+```
+
+- 可以探索R實際上丟給函數的參數
+
+## 呼叫函數的順序
+
+```r
+dx <- 1500                    # define width
+dy <- 1400                    # define height
+C  <- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+```
+
+- 在建立`C`之前，R 會先計算`seq`函數的結果，然後計算`rep`函數的結果，最後才計算`complex`函數的結果
+- 同學可以反白部份的`expression`進行檢查
+
+# 套件的使用
+
+## 套件的目的
+
+- 擴充R的功能
+    - 處理網頁的套件: `XML`、`xml2`、`jsonlite`
+    - 爬網站的套件: `httr`
+    - 跑進階分析(某篇paper的演算法)的套件: `supc`
+- 整理函數
+    - 整理資料: `dplyr`
+    - 繪圖: `ggplot2`
+- 提供資料
+    - 棒球資料: `Lahman`
+- 將程式碼轉移到其他人的電腦上運作
+    - [五分鐘學會「如何使用Rstudio建立R套件 」](https://youtu.be/OCQU6M4pPiw)
+
+## 安裝套件的`install.packages`函數
+
+```r
+?install.packages
+```
+
+- 重要的參數：`pkgs`，代表要安裝的套件的名稱
+    - `pkgs`的參數要不要加上字串
+
+## 載入套件的`library`函數
+
+- 只能載入已經安裝的套件
+- 載入後才能直接使用套件的函數
+    - `write.gif`是`caTools`的函數
+    - 沒載入的話，要使用`caTools::write.gif`來使用（`套件名稱::函數名稱`）
+
+```r
+library(caTools)
+```
+
+- **例外**: `library`的參數不需要加上引號
+    - 技術細節：[Advanced R: Non-standard evaluation](http://adv-r.had.co.nz/Computing-on-the-language.html)
+
+## 探索R 的世界
+
+探索套件 --> 探索函數
+
+重現範例 --> 修改範例
+
+- 先看套件的說明文件
+    - 套件本身的`DESCRIPTION`
+    - `vignettes`
+- 尋找有價值的範例並重現之
+- 修改範例的時候，才需要看函數的定義與參數的用法
+
+## 範例：學習 Mandelbrot set
+
+```r
+install.packages("caTools")  # install external package
+library(caTools)             # external package providing write.gif function
+jet.colors <- colorRampPalette(c("red", "blue", "#007FFF", "cyan", "#7FFF7F",
+                                 "yellow", "#FF7F00", "red", "#7F0000"))
+dx <- 1500                    # define width
+dy <- 1400                    # define height
+C  <- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+C <- matrix(C, dy, dx)       # reshape as square matrix of complex numbers
+Z <- 0                       # initialize Z to zero
+X <- array(0, c(dy, dx, 20)) # initialize output 3D array
+for (k in 1:20) {            # loop with 20 iterations
+  Z <- Z^2 + C               # the central difference equation
+  X[, , k] <- exp(-abs(Z))   # capture results
+}
+write.gif(X, "Mandelbrot.gif", col = jet.colors, delay = 100)
+```
+
+## 如何探索套件
+
+- Google
+- [CRAN Task View](https://cloud.r-project.org/web/views/)
+- 增廣見聞
+    - [台灣R軟體Club](https://www.facebook.com/groups/1210634969026548/?ref=bookmarks)
+    - [大數俱樂部](https://www.facebook.com/groups/242102892820317/)
+    - [R-bloggers](https://www.r-bloggers.com/)
+    - [R-packages R Mailing List](https://stat.ethz.ch/mailman/listinfo/r-packages)
+- 交流、問老師
+
+# R 語言的基礎物件與型態
+
+## R 物件
+
+- 所有的東西都是一種「R 物件」
+    - **資料**
+    - 函數
+    - 環境
+    - 外部指標
+
+## 向量
+
+- 複雜的R 物件們都是由基礎的R 物件所組合的。
+- 所有的R 「資料」物件（以下簡稱R物件）都是「向量」
+
+```{r}
+x <- 1:3 # x 是一個R物件，是一個向量（不只一個值）
+x[1] # 第一個值
+x[2] # 第二個值
+length(x) # 長度
+```
+
+## 型態
+
+- R 的向量有以下若干種型態：
+    - `logical` 裝布林(`TRUE`/`FALSE`)的向量
+    - `integer` 裝整數(4 bytes)的向量
+    - `numeric` 裝浮點數(8 bytes)的向量
+    - `character` 裝字串(C-style)的向量
+    - `list` 裝R物件的向量
+- `class`可以查詢物件的型態、`str`可以查詢物件的結構
+
+## 範例
+
+```{r}
+g <- lm(dist ~ speed, cars)
+str(g)
+```
+
+## 向量化的運算
+
+- R 內建迴圈
+
+```{r}
+x <- 1:3 # `:` 可以快速產生序列，`1:3` 代表從1至3間隔為1的數列
+y <- 2:4
+x + y
+```
+
+### 範例：如何快速判斷`p`是不是質數
+
+```{r}
+p <- 257
+. <- 2:(p-1) # 2 和 p-1之間的所有整數
+# 檢查他們是不是p的因數（餘數為0）
+. <- p %% . # 計算餘數
+. <- . == 0 # 拿餘數與0比較
+any(.) # 有沒有任何的因數，有因數的話p就不是值數
+# which(.) # 看看那一個是因數
+```
+
+## 向量化的對齊
+
+```{r}
+x <- 1:3
+y <- 1:6
+x + y # R會重複比較短的向量，補到一樣長之後再做運算
+```
+
+## `[`的操作
+
+- `[`可以從向量中讀出特定的資料
+- `[`是一種特別的函數
+    - 第一個參數在`[`的左邊
+    - 其他參數在`[`與`]`之間
+    - 參數有不同的型態，會有不同的效果
+    - `[` 可以與 `<-`或`=`搭配，修改向量的值
+
+## `[` + 數值向量
+
+- `x[1]`會從`x`中取出第一個位置的元素
+
+```{r}
+x <- 1:3
+x[1]
+x[1:2]
+x[-2]
+```
+
+## `[` + 布林向量
+
+- `x[c(T, F, T)]`會取出對應位置為`T`的位置的元素
+- 常見於條件篩選
+
+```{r}
+set.seed(1)
+x <- rnorm(10) # 10000個標準常態分佈的隨機亂數
+x[x > 1] # 超過1的元素
+x[x > -1 & x < 1] # 1 與 -1 之間的元素
+y <- rnorm(10)
+x[y > 1] # 那些y超過1的對應位置的x
+```
+
+## `[` + 字串向量
+
+```{r}
+x <- 1:26
+names(x) <- letters
+x["n"]
+x[c("n", "w", "w", "a")]
+```
+
+## 關於`[`
+
+- `x[...]`一定與`x`會是相同的型態
+- `[`的效果與`x`的型態無關，與`[]`之間的物件的型態有關
+
+# 安裝R 語言翻轉教室
+
+## 一行指令安裝做作業的系統
+
+```{r, eval = FALSE}
+source("http://homepage.ntu.edu.tw/~wush978/R/init-swirl.R")
+```
+
+- DataScienceAndR中有許多的單元，是我們的作業主要來源
+- 上課沒教到的部份（細節），同學要在作業中學習
+- 還會需要額外的指令安裝其他題目
+- 疑難排解： https://gitter.im/wush978/DataScienceAndR
+
+## 這周請同學完成：
+
+- 00-Hello-DataScienceAndR
+- 01-RBasic-01-Introduction
+- 01-RBasic-02-Data-Structure-Vectors
+- 01-RBasic-03-Data-Structure-Object
+- 01-RBasic-04-Factors
+
+## `list`
+
+- R 物件的向量
+    - element 可以是各種向量、函數、環境...
+- 需要使用`[[`或`$`才能接觸到裝載的向量
+
+```{r}
+g <- lm(dist ~ speed, cars)
+g[[1]]
+g$coefficients
+```
+
+
+## 學習如何從console的輸出充判斷一般的向量與`list`
+
+```{r}
+g[1]
+list(g[[1]])
+g[[1]]
+```
+
+## 屬性
+
+- R 物件的屬性是一個「有名字的`list`」
+
+```{r}
+. <- g[[1]]
+attributes(.)
+str(.)
+```
+
+## 利用`str`了解R 物件的結構
+
+```{r}
+str(g[1])
+```
+
+## `list` 與樹狀結構
+
+### 樹狀結構
+
+- 除了root，每個node都有一個**唯一的**parent node
+    - `parent ---> children`
+- root的parent是空
+
+```{r, echo = FALSE}
+suppressPackageStartupMessages(library(igraph))
+G <- graph.tree(n = 13, children = 3)
+co <- layout_as_tree(G, root=1) 
+plot(G, layout=co, vertex.size = 20, edge.color = "black")
+```
+
+## `list` 與樹狀結構
+
+- 這是不是樹狀結構?
+
+```{r, echo = FALSE}
+G <- graph.star(n = 5)
+. <- as_adjacency_matrix(G)
+. <- as.matrix(.)
+. <- t(.)
+G <- graph_from_adjacency_matrix(., mode = "directed")
+plot(G, vertex.size = 20, edge.color = "black")
+```
+
+## `list` 與樹狀結構
+
+- 這是不是樹狀結構?
+
+```{r, echo = FALSE}
+. <- matrix(c(
+  0, 1, 0,
+  0, 0, 1,
+  1, 0, 0
+), 3, 3)
+G <- graph_from_adjacency_matrix(., mode = "directed")
+plot(G, vertex.size = 20, edge.color = "black")
+```
+
+## `list` 與樹狀結構
+
+- 這是不是樹狀結構?
+
+```{r, echo = FALSE}
+G <- make_chordal_ring(5, 2)
+. <- as_adjacency_matrix(G)
+. <- as.matrix(.)
+.[upper.tri(.)] <- 0
+G <- graph_from_adjacency_matrix(., mode = "directed")
+plot(G, vertex.size = 20, edge.color = "black")
+```
+
+## `list` 與樹狀結構
+
+- `list` 可以視為建立一個R物件之間的樹狀結構
+```r
+list(2, 3, 4, 5)
+```
+```{r, echo = FALSE}
+G <- graph.star(n = 5)
+. <- as_adjacency_matrix(G)
+. <- as.matrix(.)
+. <- t(.)
+G <- graph_from_adjacency_matrix(., mode = "directed")
+plot(G, vertex.size = 20, edge.color = "black")
+```
+## `list` 與樹狀結構
+```{r}
+x <- list("2" = list(5, 6, 7), "3" = list(8, 9, 10), "4" = list(11, 12, 13))
+```
+```{r, echo = FALSE}
+suppressPackageStartupMessages(library(igraph))
+G <- graph.tree(n = 13, children = 3)
+co <- layout_as_tree(G, root=1) 
+plot(G, layout=co, vertex.size = 20, edge.color = "black")
+```
+
+## 樹狀結構常見於半結構化的資料
+
+- XML
+- JSON
+
+### 原因
+
+- 透過樹狀結構，可以讓資料之間的關係結構化，讓電腦處理
+
+```sh
+{
+   "name" : "Peter",
+   "age" : 35
+   "children" : [{"name" : "George", "age" : 5}, {"name" : "Mary", "age" : 3}]
+}
+```
+
+## `[` 與 `[[` {.columns-2}
+
+- `[`: 停留在parent，但是挑選`children`
+- `[[`: 往`children`走
+
+```{r}
+x[1] 
+```
+```{r, echo = FALSE}
+suppressPackageStartupMessages(library(igraph))
+G <- graph.tree(n = 13, children = 3)
+. <- as_adjacency_matrix(G)
+. <- as.matrix(.)
+. <- .[c(1,2,5,6,7),c(1,2,5,6,7)]
+G <- graph_from_adjacency_matrix(., "directed")
+G <- set_vertex_attr(G, "label", value = c(1,2,5,6,7))
+co <- layout_as_tree(G, root=1) 
+plot(G, layout=co, vertex.size = 20, edge.color = "black")
+```
+
+## `[` 與 `[[` {.columns-2}
+
+- `[`: 停留在parent，但是挑選`children`
+- `[[`: 往`children`走
+
+```{r}
+x[[1]] # x$`2`
+```
+```{r, echo = FALSE}
+suppressPackageStartupMessages(library(igraph))
+G <- graph.tree(n = 13, children = 3)
+. <- as_adjacency_matrix(G)
+. <- as.matrix(.)
+. <- .[c(2,5,6,7),c(2,5,6,7)]
+G <- graph_from_adjacency_matrix(., "directed")
+G <- set_vertex_attr(G, "label", value = c(2,5,6,7))
+co <- layout_as_tree(G, root=1) 
+plot(G, layout=co, vertex.size = 20, edge.color = "black")
+```
+
+## Factor 利用屬性實作的物件
+
+- 常用於取代字串`character`型態
+- 產生`data.frame`時（R 常用的，處理結構化資料的物件）會自動轉換字串為`factor`型態
+
+```{r}
+x <- iris$Species # 內建的結構化資料集
+str(x)
+attributes(x)
+```
+
+## Factor
+
+```{r}
+attributes(x) <- NULL
+str(x)
+```
+
+# R 語言的錯誤處理與除錯
+
+## R 語言的錯誤處理
+
+- Error 機制會中斷所有處理程序，除非被處理
+
+```{r, error = TRUE}
+f <- function() {
+  print(1) # 正常執行
+  stop("test error") # `stop` 拋出 condition 物件，中斷`f`的運作
+  print(2) # `f`被中斷了，不會被執行
+}
+f()
+```
+
+## R 語言的錯誤處理： `try` {.columns-2}
+
+```{r try1,error = TRUE}
+g <- function() {
+  f()
+  print(3) # 不會被執行
+}
+g()
+```
+
+```{r try2}
+g <- function() {
+  try(f(), silent = TRUE) # 處理錯誤後，會繼續執行`g`
+  print(3) # 
+}
+g()
+```
+
+## R 語言的錯誤處理： `try`
+
+- `try`在錯誤發生時，會傳回一個型態為`try-error`的物件，讓使用者判斷有無發生錯誤
+
+```{r}
+r <- try(f(), silent = TRUE)
+class(r) # 可以藉此判斷錯誤有沒有發生
+conditionMessage(attr(r, "condition")) # 可以取得呼叫`stop`時傳入的字串
+r <- try({}, silent = TRUE)
+class(r) # 不再是`try-error`
+```
+
+## R 語言的錯誤處理： `tryCatch`
+
+- 類似現代語言的`try` - `catch` - `finally` 的錯誤處理機制。
+
+```{r}
+tryCatch({
+  # 進入 try-catch block 的程式碼
+  f()
+}, error = function(e) {
+  # `e`就是捕捉到的錯誤（condition 物件）
+  print(conditionMessage(e)) # 印出錯誤訊息
+}, finally = {
+  # 無論有沒有錯誤都一定會執行的程式碼
+})
+```
+
+## 巢狀函數的除錯
+
+- 初學者不要使用巢狀函數
+
+```r
+C  <- complex(real = rep(seq(-2.2, 1.0, length.out = dx), each = dy),
+              imag = rep(seq(-1.2, 1.2, length.out = dy), dx))
+```
+
+- 請問，`each = dy`是哪個函數的參數？（不明顯，容易誤判）
+
+## 巢狀函數的除錯
+
+- 遇到錯誤時，把巢狀函數用變數展開
+    - 找錯誤的重點在縮小錯誤可能發生的範圍
+
+```{r, eval = FALSE}
+. <- seq(-2.2, 1.0, length.out = dx)
+.real <- rep(., each = dy)
+. <- seq(-1.2, 1.2, length.out = dy)
+.imag <- rep(., dx)
+C  <- complex(real = .real, imag = .imag)
+```
+
+- 透過一行一行的執行，快速掌握是那一個函數的運作出錯
+- 參數的誤值會很明顯
+
+## 除錯器
+
+- `browser()`，產生中斷點
+- `debug(f)`，在`f`函數的開頭插入中斷點。可透過`undebug`移除一開始的中斷點
+    - `f` 可以是內建，或是套件提供的函數
+- `trace` 可以暫時編輯一個函數的程式碼。（搭配`browser`使用），請看現場demo
+
+## 除錯器
+
+```{r, eval = FALSE}
+f <- function(a, ...) {
+  browser()
+}
+f(1, b = 2, 3)
+```
+
+# 安裝R 語言翻轉教室
+
+## R 語言翻轉教室
+
+- 我用swirl（也變成共同作者了）寫出來的「在R學R」的「學習環境」
+    - 為什麼要「在R學R」?
+- 協助我掌握同學們的進度
+
+## 安裝R 語言翻轉教室
+
+- 懶人包：執行 `source("https://wush978.github.io/R/init-swirl.R")`
+- 逐步執行的截圖，請參閱官方網站的[安裝區](https://datascienceandr.org/install)
+
+# R Basic 系列習題解說
+
+## 大魔王
+
+- 每個課程的最後，都會有一個難度較高的關卡
+- [課程筆記](http://datascienceandr.org/material.html#2)有每一個問題的問答，與大魔王的參考解答
+    - 忘記的同學可以利用這個區域做複習
+
+## 現場解說
+
+## Q&A
+
