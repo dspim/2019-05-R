@@ -42,6 +42,8 @@
 source("https://wush978.github.io/R/init-swirl.R")
 ```
 
+- 安裝後可以自行嘗試完成 `DataScienceAndR` 課程的 `00-Hello-DataScienceAndR` 單元。如有錯誤可以在上課當天詢問講師或教練。
+
 (4) 本次課程的投影片網址：
 
 <https://dspim.github.io/2019-05-R/>
