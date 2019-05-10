@@ -357,8 +357,8 @@ You can add R Markdown and HTML in the YAML content.
 <pre class="prettyprint lang-yaml"><code>
 ---
 title: "Introduction to R Markdown"
-author: "DSP作者群 @BenQ Workshop"
-date: "2018-06-13"
+author: "DSP作者群"
+date: "2019-05"
 output: html_document
 ---
 </code></pre>
