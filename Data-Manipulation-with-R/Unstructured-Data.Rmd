@@ -282,11 +282,12 @@ showBits <- function(r) stats::symnum(as.logical(rawToBits(r)), symbols = c("0",
 showBits(as.raw(17))
 ```
 
-## 編碼問題
+## 編碼問題 {.height-80p}
 
 - 一個整數在R中有4個bytes(8個0/1)
     - 一個bytes可以用兩個16進位表示，稱為`hex code`
 
+<div class="bigtable">
 ```{r, echo = FALSE, results = "asis"}
 .symbols <- c(paste(0:9), letters[1:6])
 . <- paste(rep(.symbols, each = 8), rep(.symbols, 8), sep = "")
@@ -294,8 +295,9 @@ showBits(as.raw(17))
   lapply(showBits) %>%
   sapply(paste, collapse = "")
 data.frame(int = 0:255, hex = ., bits = .bits) %>%
-  DT::datatable(rownames = FALSE, options = list(pageLength=8, scrollX='400px'), filter = 'top')
+  knitr::kable(format="html", align = "c")
 ```
+</div>
 
 ## `rawVector`
 
@@ -353,6 +355,34 @@ showBits(charToRaw("中"))
 
 <https://www.google.com/search?q=成奶j學>
 
+<table class="formatter">
+<tr><td style="width:50%">
+
+- `成功大學`的BIG-5 編碼是：
+
+```{r}
+. <- iconv(to="BIG5", x = "成功大學") 
+charToRaw(.)
+```
+
+</td><td style="width:50%">
+
+- `成奶j學`的BIG-5 編碼是：
+
+```{r}
+. <- iconv(to="BIG5", x = "成奶j學") 
+charToRaw(.)
+```
+
+</td></tr><tr><td colspan="2">
+
+- `5c`是？
+
+```{r}
+rawToChar(as.raw(0x5c))
+```
+
+</td></tr></table>
 ## R 處理編碼的機制
 
 - 原生的R，處理的不太好...

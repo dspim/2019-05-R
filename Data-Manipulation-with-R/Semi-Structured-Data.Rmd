@@ -240,7 +240,7 @@ xml_text(.)
     - `<小紙條>`是這份XML文件的根
     - `<html>`是所有網頁的根
 
-<table class="format">
+<table class="formatter">
 <tr><td>
 ```{r, dependson="xml.data"}
 doc <- read_xml(x)
@@ -255,20 +255,123 @@ root
 ```
 </td></tr>
 </table>
+
 ## 在XML中移動
 
 - `<收件人>`、`<發件人>`、`<主題>`、`<具體內容>`是`<小紙條>`的子(child)節點
 
-```{r, echo = FALSE, dependson="xml.data"}
-openplotmat(main = "小紙條的樹狀結構")
-pos <- coordinates(c(1, 4))
-treearrow(from = pos[1, ], to = pos[2:5, ], arr.pos = 1)
-textplain(pos[1,] + c(0, .1), lab = sprintf("<%s>", xml_name(root)))
-labs <- sprintf("<%s>", sapply(xml_children(root), xml_name))
-for(i in 2:5) {
-  textplain(pos[i,] + c(0, -.1), lab = labs[i-1])
+<center>
+```{r, echo = FALSE, dependson="xml.data", fig.width=4}
+get.tree.plot <- function(highlight = NULL) {
+  par(mai = c(0.1, 0.1, 0.1, 0.1), mar = c(0.1, 0.1, 1, 0.1))
+  openplotmat(main = "小紙條的樹狀結構")
+  pos <- coordinates(c(1, 4))
+  treearrow(from = pos[1, ], to = pos[2:5, ], arr.pos = 1)
+  textplain(pos[1,] + c(0, .1), lab = sprintf("<%s>", xml_name(root)))
+  labs <- sprintf("<%s>", sapply(xml_children(root), xml_name))
+  for(i in 2:5) {
+    textplain(pos[i,] + c(0, -.1), lab = labs[i-1])
+  }
+  if (!is.null(highlight)) {
+    symbol <- rep(rawToChar(as.raw(c(0xe2, 0x96, 0x88))), nchar(sprintf("<%s>", xml_name(root)))) %>%
+      paste(collapse = "")
+    for(i in highlight) {
+      textplain(pos[i,] + c(0, ifelse(i == 1, .1, -.1)), lab = symbol, col = "#CCCC0099")
+    }
+  }
+  pos
 }
+get.tree.plot()
 ```
+</center>
+
+## 在XML中移動
+
+<table class="formatter">
+<tr>
+<td>
+
+- 假設我們定位了一個node，例如`<小紙條>`
+
+```{r}
+node <- xml_root(doc)
+node
+```
+
+</td><td>
+
+```{r, echo = FALSE, dependson="xml.data", fig.width=4}
+pos <- get.tree.plot(1)
+```
+
+</td></tr></table>
+
+## 在XML中移動
+
+<table class="formatter">
+<tr>
+<td>
+
+- 可以取得`node`的子節點們(nodeset)
+
+```{r}
+xml_children(node)
+```
+
+</td><td>
+
+```{r, echo = FALSE, dependson="xml.data", fig.width=4}
+pos <- get.tree.plot(2:5)
+```
+
+</td></tr></table>
+
+## 在XML中移動
+
+<table class="formatter">
+<tr>
+<td>
+
+- 用中括號從一群節點(nodeset)中挑出一個特定的節點
+
+```{r}
+node <- xml_children(node)[[2]]
+node
+```
+
+</td><td>
+
+```{r, echo = FALSE, dependson="xml.data", fig.width=4}
+pos <- get.tree.plot(3)
+```
+
+</td></tr></table>
+
+## 在XML中移動
+
+<table class="formatter">
+<tr>
+<td>
+
+- 用`xml_parent`來找出父節點(parent)
+
+```{r}
+node <- xml_parent(node)
+node
+```
+
+</td><td>
+
+```{r, echo = FALSE, dependson="xml.data", fig.width=4}
+pos <- get.tree.plot(1)
+```
+
+</td></tr></table>
+
+## XML中的移動
+
+- 透過上述的要領，只要給我們一個節點，我們即可從該節點開始遊走整棵樹
+- 如何快速定位出我們要的節點？
 
 ## XPath與XML的樹狀結構
 
@@ -289,8 +392,45 @@ for(i in 2:5) {
 
 ## XPath範例
 
+<table class="formatter">
+<tr>
+<td>
+
+- `xml_find_first`回傳一個node
+
 ```{r}
+xml_find_first(doc, "/小紙條/主題")
 ```
+
+
+</td><td>
+
+```{r, echo = FALSE, dependson="xml.data", fig.width=4}
+pos <- get.tree.plot(4)
+```
+
+</td></tr></table>
+
+## XPath範例
+
+<table class="formatter">
+<tr>
+<td>
+
+- `xml_find_all`回傳一個nodeset
+
+```{r}
+xml_find_all(doc, "/小紙條/主題")
+```
+
+
+</td><td>
+
+```{r, echo = FALSE, dependson="xml.data", fig.width=4}
+pos <- get.tree.plot(4)
+```
+
+</td></tr></table>
 
 ## 範例：政府採購資料網的解析
 

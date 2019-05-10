@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>半結構化的資料處理</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+  <meta name="date" content="2019-05-11" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: '半結構化的資料處理',
+                        useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                      },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Wush Wu' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <link href="Semi-Structured-Data_files/ioslides-13.5.1/fonts/fonts.css" rel="stylesheet" />
+  <link href="Semi-Structured-Data_files/ioslides-13.5.1/theme/css/default.css" rel="stylesheet" />
+  <link href="Semi-Structured-Data_files/ioslides-13.5.1/theme/css/phone.css" rel="stylesheet" />
+  <script src="Semi-Structured-Data_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+  <script src="Semi-Structured-Data_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+  <script src="Semi-Structured-Data_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+  <script src="Semi-Structured-Data_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+  <script src="Semi-Structured-Data_files/ioslides-13.5.1/js/hammer.js"></script>
+  <script src="Semi-Structured-Data_files/ioslides-13.5.1/js/slide-controller.js"></script>
+  <script src="Semi-Structured-Data_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    summary {
+      display: list-item;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
+
+  </style>
+
+  <link rel="stylesheet" href="semi-structured-data.css" type="text/css" />
+  <link rel="stylesheet" href="../css/dsp.css" type="text/css" />
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../css/wush-custom.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;">2019-05-11</p>
+          </hgroup>
+  </slide>
+
+<slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>半結構化的資料處理</h2></hgroup><article  id="section">
+
+</article></slide><slide class=""><hgroup><h2>大綱</h2></hgroup><article  id="section-1">
+
+<ul>
+<li>XML</li>
+<li>JSON</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>XML</h2></hgroup><article  id="xml">
+
+</article></slide><slide class=""><hgroup><h2>XML(eXtensible Markup Language)</h2></hgroup><article  id="xmlextensible-markup-language">
+
+<ul>
+<li>讓電腦能理解資料意義的資料格式
+
+<ul>
+<li>標籤(tag)</li>
+<li>屬性(attribute)</li>
+<li>內容(contents)</li>
+</ul></li>
+<li>由使用者定義標籤的意義</li>
+</ul>
+
+<pre >&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;小紙條&gt;
+ &lt;收件人&gt;大元&lt;/收件人&gt;
+ &lt;發件人&gt;小張&lt;/發件人&gt;
+ &lt;主題&gt;問候&lt;/主題&gt;
+ &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;
+&lt;/小紙條&gt;</pre>
+
+<p><small>出自：<a href='https://zh.wikipedia.org/wiki/XML#.E4.BE.8B' title=''>https://zh.wikipedia.org/wiki/XML#.E4.BE.8B</a></small></p>
+
+</article></slide><slide class=""><hgroup><h2>XML標籤</h2></hgroup><article  id="xml-1">
+
+<pre >&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;小紙條&gt;
+ &lt;收件人&gt;大元&lt;/收件人&gt;
+ &lt;發件人&gt;小張&lt;/發件人&gt;
+ &lt;主題&gt;問候&lt;/主題&gt;
+ &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;
+&lt;/小紙條&gt;</pre>
+
+<ul>
+<li>請問上述XML中有幾種標籤？
+
+<ul>
+<li>小紙條</li>
+<li>收件人</li>
+<li>發件人</li>
+<li>主題</li>
+<li>具體內容</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>XML內容</h2></hgroup><article  id="xml-2">
+
+<pre >&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;小紙條&gt;
+ &lt;收件人&gt;大元&lt;/收件人&gt;
+ &lt;發件人&gt;小張&lt;/發件人&gt;
+ &lt;主題&gt;問候&lt;/主題&gt;
+ &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;
+&lt;/小紙條&gt;</pre>
+
+<ul>
+<li>請問上述XML中各個標籤的內容是？
+
+<ul>
+<li>小紙條：<code>&lt;收件人&gt; ... &lt;/具體內容&gt;</code></li>
+<li>收件人：<code>大元</code></li>
+<li>發件人：<code>小張</code></li>
+<li>主題：<code>問候</code></li>
+<li>具體內容：<code>早啊，飯吃了沒？</code></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>XML屬性</h2></hgroup><article  id="xml-3">
+
+<ul>
+<li>標籤可以附帶屬性</li>
+</ul>
+
+<h3>沒有屬性的標籤</h3>
+
+<pre >&lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;</pre>
+
+<h3>有屬性的標籤</h3>
+
+<pre >&lt;具體內容 font=&quot;新細明體&quot; size=&quot;12&quot;&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;</pre>
+
+<ul>
+<li><code>&lt;具體內容&gt;</code>有以下的標籤：
+
+<ul>
+<li><code>font</code>：<code>新細明體</code></li>
+<li><code>size</code>：<code>12</code></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>XML declaration</h2></hgroup><article  id="xml-declaration">
+
+<ul>
+<li>XML的第一行通常會宣告這一份XML文件所依循的標準與文件所使用的編碼（編碼是什麼，下週會討論到）</li>
+</ul>
+
+<pre >&lt;?xml version=&quot;1.0&quot;?&gt;</pre>
+
+<pre >&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</pre>
+
+</article></slide><slide class=""><hgroup><h2>HTML</h2></hgroup><article  id="html">
+
+<p>(HyperText Markup Language)</p>
+
+<ul>
+<li>HTML用於撰寫網頁</li>
+<li>HTML是比較寬鬆的XML，但是XML不是HTML
+
+<ul>
+<li>HTML允許用<code>&lt;foo/&gt;</code>代替<code>&lt;foo&gt;&lt;/foo&gt;</code></li>
+<li>HTML中的標籤是被定義的</li>
+<li>XML可以自己定義標籤</li>
+</ul></li>
+</ul>
+
+<pre><code>
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    xmlDoc=<a href="dom_loadxmldoc.asp">loadXMLDoc</a>(&quot;books.xml&quot;);
+    document.write(&quot;xmlDoc is loaded, ready for use&quot;);
+  &lt;/script&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+<p><small>出自：<a href='http://www.w3school.com.cn/tags/tag_pre.asp' title=''>http://www.w3school.com.cn/tags/tag_pre.asp</a></small></p>
+
+</article></slide><slide class=""><hgroup><h2>把XML當非結構化資料作處理</h2></hgroup><article  id="xml-4">
+
+<pre class = 'prettyprint lang-r'>x &lt;- &#39;&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;小紙條&gt;
+ &lt;收件人&gt;大元&lt;/收件人&gt;
+ &lt;發件人&gt;小張&lt;/發件人&gt;
+ &lt;主題&gt;問候&lt;/主題&gt;
+ &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;
+&lt;/小紙條&gt;
+&#39;</pre>
+
+<ul>
+<li>請找出這個紙條的主題
+
+<ul>
+<li>請找出標籤<主題>的內容</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>把XML當非結構化資料作處理</h2></hgroup><article  id="xml-5">
+
+<pre class = 'prettyprint lang-r'>. &lt;- strsplit(x, &quot;\n&quot;)
+. &lt;- .[[1]]
+. &lt;- .[grepl(&quot;主題&quot;, .)]
+. &lt;- gsub(&quot;&lt;主題&gt;&quot;, &quot;&quot;, .)
+gsub(&quot;&lt;/主題&gt;&quot;, &quot;&quot;, .)</pre>
+
+<pre >## [1] &quot; 問候&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>把XML當XML作處理</h2></hgroup><article  id="xmlxml">
+
+<ul>
+<li>運用XML的結構，我們可以更穩健的找到我們要的資訊</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(xml2)
+doc &lt;- read_xml(x)
+. &lt;- xml_find_first(doc, &quot;/小紙條/主題&quot;)
+xml_text(.)</pre>
+
+<pre >## [1] &quot;問候&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>XPath與XML的樹狀結構</h2></hgroup><article  id="xpathxml">
+
+<pre >&lt;小紙條&gt;
+ &lt;收件人&gt;大元&lt;/收件人&gt;
+ &lt;發件人&gt;小張&lt;/發件人&gt;
+ &lt;主題&gt;問候&lt;/主題&gt;
+ &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;
+&lt;/小紙條&gt;</pre>
+
+<ul>
+<li><code>&lt;小紙條&gt;</code>是<code>&lt;主題&gt;</code>的父標籤
+
+<ul>
+<li>標籤之間的空白是不影響的XML的（只是為了排版好讀）</li>
+</ul></li>
+<li><code>&lt;收件人&gt;</code>、<code>&lt;發件人&gt;</code>、<code>&lt;主題&gt;</code>與<code>&lt;具體內容&gt;</code>都是<code>&lt;小紙條&gt;</code>的子標籤</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>XPath與XML的樹狀結構</h2></hgroup><article  id="xpathxml-1">
+
+<ul>
+<li>除了最上層的根之外，XML中所有的標籤都有「唯一」的「父標籤」
+
+<ul>
+<li><code>&lt;小紙條&gt;</code>是這份XML文件的根</li>
+<li><code>&lt;html&gt;</code>是所有網頁的根</li>
+</ul></li>
+</ul>
+
+<table class="formatter">
+
+<tr>
+
+<td>
+
+<pre class = 'prettyprint lang-r'>doc &lt;- read_xml(x)
+class(doc)</pre>
+
+<pre >## [1] &quot;xml_document&quot; &quot;xml_node&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>doc</pre>
+
+<pre >## {xml_document}
+## &lt;小紙條&gt;
+## [1] &lt;收件人&gt;大元&lt;/收件人&gt;
+## [2] &lt;發件人&gt;小張&lt;/發件人&gt;
+## [3] &lt;主題&gt;問候&lt;/主題&gt;
+## [4] &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;</pre>
+
+</td>
+
+<td>
+
+<pre class = 'prettyprint lang-r'>root &lt;- xml_root(doc)
+class(root)</pre>
+
+<pre >## [1] &quot;xml_document&quot; &quot;xml_node&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>root</pre>
+
+<pre >## {xml_document}
+## &lt;小紙條&gt;
+## [1] &lt;收件人&gt;大元&lt;/收件人&gt;
+## [2] &lt;發件人&gt;小張&lt;/發件人&gt;
+## [3] &lt;主題&gt;問候&lt;/主題&gt;
+## [4] &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;</pre>
+
+</td>
+
+</tr>
+
+</table>
+
+</article></slide><slide class=""><hgroup><h2>在XML中移動</h2></hgroup><article  id="xml-6">
+
+<ul>
+<li><code>&lt;收件人&gt;</code>、<code>&lt;發件人&gt;</code>、<code>&lt;主題&gt;</code>、<code>&lt;具體內容&gt;</code>是<code>&lt;小紙條&gt;</code>的子(child)節點</li>
+</ul>
+
+<center>
+
+<p><img src="Semi-Structured-Data_files/figure-html/unnamed-chunk-3-1.png" width="384" /></p>
+
+<pre >##       [,1] [,2]
+## [1,] 0.500 0.75
+## [2,] 0.125 0.25
+## [3,] 0.375 0.25
+## [4,] 0.625 0.25
+## [5,] 0.875 0.25</pre>
+
+</center>
+
+</article></slide><slide class=""><hgroup><h2>在XML中移動</h2></hgroup><article  id="xml-7">
+
+<table class="formatter">
+
+<tr>
+
+<td>
+
+<ul>
+<li>假設我們定位了一個node，例如<code>&lt;小紙條&gt;</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>node &lt;- xml_root(doc)
+node</pre>
+
+<pre >## {xml_document}
+## &lt;小紙條&gt;
+## [1] &lt;收件人&gt;大元&lt;/收件人&gt;
+## [2] &lt;發件人&gt;小張&lt;/發件人&gt;
+## [3] &lt;主題&gt;問候&lt;/主題&gt;
+## [4] &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;</pre>
+
+</td>
+
+<td>
+
+<p><img src="Semi-Structured-Data_files/figure-html/unnamed-chunk-5-1.png" width="384" /></p>
+
+</td>
+
+</tr>
+
+</table>
+
+</article></slide><slide class=""><hgroup><h2>在XML中移動</h2></hgroup><article  id="xml-8">
+
+<table class="formatter">
+
+<tr>
+
+<td>
+
+<ul>
+<li>可以取得<code>node</code>的子節點們(nodeset)</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>xml_children(node)</pre>
+
+<pre >## {xml_nodeset (4)}
+## [1] &lt;收件人&gt;大元&lt;/收件人&gt;
+## [2] &lt;發件人&gt;小張&lt;/發件人&gt;
+## [3] &lt;主題&gt;問候&lt;/主題&gt;
+## [4] &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;</pre>
+
+</td>
+
+<td>
+
+<p><img src="Semi-Structured-Data_files/figure-html/unnamed-chunk-7-1.png" width="384" /></p>
+
+</td>
+
+</tr>
+
+</table>
+
+</article></slide><slide class=""><hgroup><h2>在XML中移動</h2></hgroup><article  id="xml-9">
+
+<table class="formatter">
+
+<tr>
+
+<td>
+
+<ul>
+<li>用中括號從一群節點(nodeset)中挑出一個特定的節點</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>node &lt;- xml_children(node)[[2]]
+node</pre>
+
+<pre >## {xml_node}
+## &lt;發件人&gt;</pre>
+
+</td>
+
+<td>
+
+<p><img src="Semi-Structured-Data_files/figure-html/unnamed-chunk-9-1.png" width="384" /></p>
+
+</td>
+
+</tr>
+
+</table>
+
+</article></slide><slide class=""><hgroup><h2>在XML中移動</h2></hgroup><article  id="xml-10">
+
+<table class="formatter">
+
+<tr>
+
+<td>
+
+<ul>
+<li>用<code>xml_parent</code>來找出父節點(parent)</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>node &lt;- xml_parent(node)
+node</pre>
+
+<pre >## {xml_node}
+## &lt;小紙條&gt;
+## [1] &lt;收件人&gt;大元&lt;/收件人&gt;
+## [2] &lt;發件人&gt;小張&lt;/發件人&gt;
+## [3] &lt;主題&gt;問候&lt;/主題&gt;
+## [4] &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;</pre>
+
+</td>
+
+<td>
+
+<p><img src="Semi-Structured-Data_files/figure-html/unnamed-chunk-11-1.png" width="384" /></p>
+
+</td>
+
+</tr>
+
+</table>
+
+</article></slide><slide class=""><hgroup><h2>XML中的移動</h2></hgroup><article  id="xml-11">
+
+<ul>
+<li>透過上述的要領，只要給我們一個節點，我們即可從該節點開始遊走整棵樹</li>
+<li>如何快速定位出我們要的節點？</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>XPath與XML的樹狀結構</h2></hgroup><article  id="xpathxml-2">
+
+<ul>
+<li><a href='https://en.wikipedia.org/wiki/XPath' title=''>XPath</a>透過樹狀結構與屬性，幫助我們快速的從XML中找到節點</li>
+</ul>
+
+<pre >&lt;小紙條&gt;
+ &lt;收件人&gt;大元&lt;/收件人&gt;
+ &lt;發件人&gt;小張&lt;/發件人&gt;
+ &lt;主題&gt;問候&lt;/主題&gt;
+ &lt;具體內容&gt;早啊，飯吃了沒？ &lt;/具體內容&gt;
+&lt;/小紙條&gt;</pre>
+
+<ul>
+<li>根：<code>/小紙條</code></li>
+<li><code>小紙條</code>下的<code>主題</code>：<code>/小紙條/主題</code></li>
+<li>所有的主題：<code>//主題</code></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>XPath範例</h2></hgroup><article  id="xpath">
+
+<table class="formatter">
+
+<tr>
+
+<td>
+
+<ul>
+<li><code>xml_find_first</code>回傳一個node</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>xml_find_first(doc, &quot;/小紙條/主題&quot;)</pre>
+
+<pre >## {xml_node}
+## &lt;主題&gt;</pre>
+
+</td>
+
+<td>
+
+<p><img src="Semi-Structured-Data_files/figure-html/unnamed-chunk-13-1.png" width="384" /></p>
+
+</td>
+
+</tr>
+
+</table>
+
+</article></slide><slide class=""><hgroup><h2>XPath範例</h2></hgroup><article  id="xpath-1">
+
+<table class="formatter">
+
+<tr>
+
+<td>
+
+<ul>
+<li><code>xml_find_all</code>回傳一個nodeset</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>xml_find_all(doc, &quot;/小紙條/主題&quot;)</pre>
+
+<pre >## {xml_nodeset (1)}
+## [1] &lt;主題&gt;問候&lt;/主題&gt;</pre>
+
+</td>
+
+<td>
+
+<p><img src="Semi-Structured-Data_files/figure-html/unnamed-chunk-15-1.png" width="384" /></p>
+
+</td>
+
+</tr>
+
+</table>
+
+</article></slide><slide class=""><hgroup><h2>範例：政府採購資料網的解析</h2></hgroup><article  id="section-4">
+
+<pre class = 'prettyprint lang-r'>tmp.path &lt;- tempfile(fileext = &quot;.html&quot;)
+download.file(&quot;http://homepage.ntu.edu.tw/~wush978/rdataengineer/0080400004.html&quot;, destfile = tmp.path)
+browseURL(tmp.path)
+x &lt;- read_html(tmp.path)</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例：找出中間表格中的資料名稱</h2></hgroup><article  id="section-5">
+
+<ul>
+<li><code>機關代碼</code>、<code>機關名稱</code>等標籤內容，代表的是右邊的標籤內容的「資料名稱」</li>
+<li>透過瀏覽器，我們發現兩者同是<code>tr</code>標籤底下的<code>th</code>與<code>td</code>
+
+<ul>
+<li>「資料名稱」是<code>th</code>標籤的內容</li>
+<li>「資料內容」是<code>td</code>標籤的內容</li>
+</ul></li>
+<li>利用XPath直接找出所有<code>tr</code>底下的<code>th</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- xml_find_all(x, &quot;//tr/th&quot;)
+. &lt;- sapply(., xml_text)
+head(.)</pre>
+
+<pre >## [1] &quot;機關代碼&quot; &quot;機關名稱&quot; &quot;單位名稱&quot; &quot;機關地址&quot; &quot;聯絡人&quot;   &quot;聯絡電話&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>tail(.)</pre>
+
+<pre >## [1] &quot;總決標金額&quot;                        
+## [2] &quot;總決標金額是否公開&quot;                
+## [3] &quot;契約是否訂有依物價指數調整價金規定&quot;
+## [4] &quot;未列物價調整規定說明&quot;              
+## [5] &quot;履約執行機關&quot;                      
+## [6] &quot;附加說明&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例：找出中間表格中的資料內容</h2></hgroup><article  id="section-6">
+
+<ul>
+<li>直接用XPath找出所有的f<code>tr</code>底下的<code>td</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>th &lt;- xml_find_all(x, &quot;//tr/th&quot;)
+td &lt;- xml_find_all(x, &quot;//tr/td&quot;)
+length(th)</pre>
+
+<pre >## [1] 116</pre>
+
+<pre class = 'prettyprint lang-r'>length(td)</pre>
+
+<pre >## [1] 214</pre>
+
+<ul>
+<li><code>td</code>太多了</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>範例：找出中間表格中的資料內容</h2></hgroup><article  id="section-7">
+
+<ul>
+<li>直接用XPath找出所有的<code>th</code>旁邊的<code>td</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>th &lt;- xml_find_all(x, &quot;//tr/th&quot;)
+td &lt;- xml_find_all(x, &quot;//tr/th/../td&quot;)
+length(th)</pre>
+
+<pre >## [1] 116</pre>
+
+<pre class = 'prettyprint lang-r'>length(td)</pre>
+
+<pre >## [1] 116</pre>
+
+</article></slide><slide class=""><hgroup><h2>找出「機關名稱」</h2></hgroup><article  id="section-8">
+
+<pre class = 'prettyprint lang-r'>th.text &lt;- sapply(th, xml_text)
+td.text &lt;- sapply(td, xml_text)
+td.text &lt;- trimws(td.text)
+td.text[th.text == &quot;機關名稱&quot;]</pre>
+
+<pre >## [1] &quot;台灣電力股份有限公司&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>找出「標案名稱」</h2></hgroup><article  id="section-9">
+
+<pre class = 'prettyprint lang-r'>td.text &lt;- trimws(td.text)
+td.text[th.text == &quot;標案名稱&quot;]</pre>
+
+<pre >## [1] &quot;套管插頭等壹批&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>隨堂練習</h2></hgroup><article  id="section-10">
+
+<ul>
+<li>找出投標公司的統編</li>
+<li>找出得標公司的統邊</li>
+<li>找出所有和查詢有關的連結其背後的網址</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
