@@ -1,0 +1,368 @@
+---
+title: "半結構化的資料處理"
+author: "Wush Wu"
+date: "`r Sys.Date()`"
+output: 
+  ioslides_presentation:
+    css:
+      - semi-structured-data.css
+      - ../css/dsp.css
+      - ../css/style.css
+      - ../css/wush-custom.css
+    self_contained: no
+    widescreen: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+fullimg.css <- new.env()
+fullimg <- function(path, symbol, dsr = TRUE) {
+  if (exists(symbol, envir = fullimg.css)) stop("Symbol collision")
+  if (dsr) fullimg.css[[symbol]] <- sprintf("https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s", path) else fullimg.css[[symbol]] <- path
+  sprintf(".fullimg .%s", symbol)
+}
+knitr::knit_hooks$set("document" = function(x) {
+  css <- sapply(ls(fullimg.css), function(symbol) {
+    sprintf("article.%s {\n  width : 100%%;\n  height : 80%%;\n  background : url(%s);\n  background-size : 100%% 100%%;}\n", symbol, fullimg.css[[symbol]])
+  })
+  write(css, file = "semi-structured-data.css")
+  x
+})
+fig <- function(path, style = "max-width: 100%; max-height: 100%; ", dsr = TRUE) {
+  if (dsr) sprintf("<img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s' style='%s'></img>", path, style) else sprintf("<img src='img/%s' style='%s'></img>", path, style)
+}
+library(magrittr)
+library(dplyr)
+library(diagram)
+if (Sys.info()["sysname"] == "Darwin") {
+  knitr::knit_hooks$set(chinese_font = function(before, options, envir) {
+    if (before) {
+      par(family = "黑體-繁 中黑")
+    }
+  })
+  knitr::opts_chunk$set(chinese_font = TRUE)
+}
+```
+
+# 半結構化的資料處理
+
+## 大綱
+
+- XML
+- JSON
+
+# XML
+
+## XML(eXtensible Markup Language)
+
+- 讓電腦能理解資料意義的資料格式
+    - 標籤(tag)
+    - 屬性(attribute)
+    - 內容(contents)
+- 由使用者定義標籤的意義
+
+```
+<?xml version="1.0"?>
+<小紙條>
+ <收件人>大元</收件人>
+ <發件人>小張</發件人>
+ <主題>問候</主題>
+ <具體內容>早啊，飯吃了沒？ </具體內容>
+</小紙條>
+```
+
+<small>出自：<https://zh.wikipedia.org/wiki/XML#.E4.BE.8B></small>
+
+## XML標籤
+
+```
+<?xml version="1.0"?>
+<小紙條>
+ <收件人>大元</收件人>
+ <發件人>小張</發件人>
+ <主題>問候</主題>
+ <具體內容>早啊，飯吃了沒？ </具體內容>
+</小紙條>
+```
+
+- 請問上述XML中有幾種標籤？
+    - 小紙條
+    - 收件人
+    - 發件人
+    - 主題
+    - 具體內容
+    
+## XML內容
+
+```
+<?xml version="1.0"?>
+<小紙條>
+ <收件人>大元</收件人>
+ <發件人>小張</發件人>
+ <主題>問候</主題>
+ <具體內容>早啊，飯吃了沒？ </具體內容>
+</小紙條>
+```
+
+- 請問上述XML中各個標籤的內容是？
+    - 小紙條：`<收件人> ... </具體內容>`
+    - 收件人：`大元`
+    - 發件人：`小張`
+    - 主題：`問候`
+    - 具體內容：`早啊，飯吃了沒？`
+
+## XML屬性
+
+- 標籤可以附帶屬性
+
+
+### 沒有屬性的標籤
+
+```
+<具體內容>早啊，飯吃了沒？ </具體內容>
+```
+
+### 有屬性的標籤
+
+```
+<具體內容 font="新細明體" size="12">早啊，飯吃了沒？ </具體內容>
+```
+
+- `<具體內容>`有以下的標籤：
+    - `font`：`新細明體`
+    - `size`：`12`
+
+## XML declaration
+
+- XML的第一行通常會宣告這一份XML文件所依循的標準與文件所使用的編碼（編碼是什麼，下週會討論到）
+
+```
+<?xml version="1.0"?>
+```
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+```
+
+## HTML
+
+ (HyperText Markup Language)
+
+- HTML用於撰寫網頁
+- HTML是比較寬鬆的XML，但是XML不是HTML
+    - HTML允許用`<foo/>`代替`<foo></foo>`
+    - HTML中的標籤是被定義的
+    - XML可以自己定義標籤
+
+<pre><code>
+&lt;html&gt;
+
+&lt;head&gt;
+  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+
+  &lt;script type=&quot;text/javascript&quot;&gt;
+    xmlDoc=<a href="dom_loadxmldoc.asp">loadXMLDoc</a>(&quot;books.xml&quot;);
+    document.write(&quot;xmlDoc is loaded, ready for use&quot;);
+  &lt;/script&gt;
+
+&lt;/body&gt;
+
+&lt;/html&gt;
+</code></pre>
+
+<small>出自：<http://www.w3school.com.cn/tags/tag_pre.asp></small>
+
+
+## 把XML當非結構化資料作處理
+
+```{r xml.data}
+x <- '<?xml version="1.0"?>
+<小紙條>
+ <收件人>大元</收件人>
+ <發件人>小張</發件人>
+ <主題>問候</主題>
+ <具體內容>早啊，飯吃了沒？ </具體內容>
+</小紙條>
+'
+```
+
+
+
+- 請找出這個紙條的主題
+    - 請找出標籤<主題>的內容
+
+## 把XML當非結構化資料作處理
+
+```{r xml.parsing}
+. <- strsplit(x, "\n")
+. <- .[[1]]
+. <- .[grepl("主題", .)]
+. <- gsub("<主題>", "", .)
+gsub("</主題>", "", .)
+```
+
+## 把XML當XML作處理
+
+- 運用XML的結構，我們可以更穩健的找到我們要的資訊
+
+```{r xml.xml2}
+library(xml2)
+doc <- read_xml(x)
+. <- xml_find_first(doc, "/小紙條/主題")
+xml_text(.)
+```
+
+## XPath與XML的樹狀結構
+
+```
+<小紙條>
+ <收件人>大元</收件人>
+ <發件人>小張</發件人>
+ <主題>問候</主題>
+ <具體內容>早啊，飯吃了沒？ </具體內容>
+</小紙條>
+```
+
+- `<小紙條>`是`<主題>`的父標籤
+    - 標籤之間的空白是不影響的XML的（只是為了排版好讀）
+- `<收件人>`、`<發件人>`、`<主題>`與`<具體內容>`都是`<小紙條>`的子標籤
+
+## XPath與XML的樹狀結構
+
+- 除了最上層的根之外，XML中所有的標籤都有「唯一」的「父標籤」
+    - `<小紙條>`是這份XML文件的根
+    - `<html>`是所有網頁的根
+
+<table class="format">
+<tr><td>
+```{r, dependson="xml.data"}
+doc <- read_xml(x)
+class(doc)
+doc
+```
+</td><td>
+```{r, dependson="xml.data"}
+root <- xml_root(doc)
+class(root)
+root
+```
+</td></tr>
+</table>
+## 在XML中移動
+
+- `<收件人>`、`<發件人>`、`<主題>`、`<具體內容>`是`<小紙條>`的子(child)節點
+
+```{r, echo = FALSE, dependson="xml.data"}
+openplotmat(main = "小紙條的樹狀結構")
+pos <- coordinates(c(1, 4))
+treearrow(from = pos[1, ], to = pos[2:5, ], arr.pos = 1)
+textplain(pos[1,] + c(0, .1), lab = sprintf("<%s>", xml_name(root)))
+labs <- sprintf("<%s>", sapply(xml_children(root), xml_name))
+for(i in 2:5) {
+  textplain(pos[i,] + c(0, -.1), lab = labs[i-1])
+}
+```
+
+## XPath與XML的樹狀結構
+
+- [XPath](https://en.wikipedia.org/wiki/XPath)透過樹狀結構與屬性，幫助我們快速的從XML中找到節點
+
+```
+<小紙條>
+ <收件人>大元</收件人>
+ <發件人>小張</發件人>
+ <主題>問候</主題>
+ <具體內容>早啊，飯吃了沒？ </具體內容>
+</小紙條>
+```
+
+- 根：`/小紙條`
+- `小紙條`下的`主題`：`/小紙條/主題`
+- 所有的主題：`//主題`
+
+## XPath範例
+
+```{r}
+```
+
+## 範例：政府採購資料網的解析
+
+```{r html.data.echo, eval = FALSE}
+tmp.path <- tempfile(fileext = ".html")
+download.file("http://homepage.ntu.edu.tw/~wush978/rdataengineer/0080400004.html", destfile = tmp.path)
+browseURL(tmp.path)
+x <- read_html(tmp.path)
+```
+
+```{r html.data, cache = FALSE, echo = FALSE}
+library(xml2)
+x <- read_html("0080400004.html")
+```
+
+## 範例：找出中間表格中的資料名稱
+
+- `機關代碼`、`機關名稱`等標籤內容，代表的是右邊的標籤內容的「資料名稱」
+- 透過瀏覽器，我們發現兩者同是`tr`標籤底下的`th`與`td`
+    - 「資料名稱」是`th`標籤的內容
+    - 「資料內容」是`td`標籤的內容
+- 利用XPath直接找出所有`tr`底下的`th`
+
+```{r}
+. <- xml_find_all(x, "//tr/th")
+. <- sapply(., xml_text)
+head(.)
+tail(.)
+```
+
+## 範例：找出中間表格中的資料內容
+
+- 直接用XPath找出所有的f`tr`底下的`td`
+
+```{r}
+th <- xml_find_all(x, "//tr/th")
+td <- xml_find_all(x, "//tr/td")
+length(th)
+length(td)
+```
+
+- `td`太多了
+
+## 範例：找出中間表格中的資料內容
+
+- 直接用XPath找出所有的`th`旁邊的`td`
+
+```{r}
+th <- xml_find_all(x, "//tr/th")
+td <- xml_find_all(x, "//tr/th/../td")
+length(th)
+length(td)
+```
+
+## 找出「機關名稱」
+
+```{r}
+th.text <- sapply(th, xml_text)
+td.text <- sapply(td, xml_text)
+td.text <- trimws(td.text)
+td.text[th.text == "機關名稱"]
+```
+
+## 找出「標案名稱」
+
+```{r}
+td.text <- trimws(td.text)
+td.text[th.text == "標案名稱"]
+```
+
+## 隨堂練習
+
+- 找出投標公司的統編
+- 找出得標公司的統邊
+- 找出所有和查詢有關的連結其背後的網址
