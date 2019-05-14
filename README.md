@@ -2,9 +2,9 @@
 ## 課程大綱
 
 1. [環境與基本語法](R-Installation-Basic/R-Installation-Basic.html)
-2. 資料處理-非結構化
-3. 資料處理-半結構化
-4. 資料處理-結構化
+2. [資料處理-非結構化](Data-Manipulation-with-R/Unstructured-Data.html)
+3. [資料處理-半結構化](Data-Manipulation-with-R/Semi-Structured-Data.html)
+4. [資料處理-結構化](Data-Manipulation-with-R/Structured-Data.html)
 5. 資料處理-整合
 6. 視覺化-1
 7. 視覺化-2
