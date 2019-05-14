@@ -6,9 +6,9 @@
 3. [資料處理-半結構化](Data-Manipulation-with-R/Semi-Structured-Data.html)
 4. [資料處理-結構化](Data-Manipulation-with-R/Structured-Data.html)
 5. 資料處理-整合
-6. 視覺化-1
-7. 視覺化-2
-8. 報表製作
+6. [視覺化-1](R-EDA-RMD/R_EDA_Visualization.html)
+7. [視覺化-2](R-EDA-RMD/R_EDA_Visualization.html#32)
+8. [報表製作](R-EDA-RMD/R_markdown.html)
 
 ## 行前通知
 
