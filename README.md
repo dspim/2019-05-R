@@ -1,7 +1,7 @@
 
 ## 課程大綱
 
-1. 環境與基本語法
+1. [環境與基本語法](R-Installation-Basic/R-Installation-Basic.html)
 2. 資料處理-非結構化
 3. 資料處理-半結構化
 4. 資料處理-結構化
