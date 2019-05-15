@@ -1,0 +1,3203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>結構化的資料處理</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+  <meta name="date" content="2019-05-11" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: '結構化的資料處理',
+                        useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                      },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Wush Wu' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <link href="Structured-Data_files/ioslides-13.5.1/fonts/fonts.css" rel="stylesheet" />
+  <link href="Structured-Data_files/ioslides-13.5.1/theme/css/default.css" rel="stylesheet" />
+  <link href="Structured-Data_files/ioslides-13.5.1/theme/css/phone.css" rel="stylesheet" />
+  <script src="Structured-Data_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+  <script src="Structured-Data_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+  <script src="Structured-Data_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+  <script src="Structured-Data_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+  <script src="Structured-Data_files/ioslides-13.5.1/js/hammer.js"></script>
+  <script src="Structured-Data_files/ioslides-13.5.1/js/slide-controller.js"></script>
+  <script src="Structured-Data_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    summary {
+      display: list-item;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
+
+  </style>
+
+  <link rel="stylesheet" href="structured-data.css" type="text/css" />
+  <link rel="stylesheet" href="../css/dsp.css" type="text/css" />
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../css/wush-custom.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;">2019-05-11</p>
+          </hgroup>
+  </slide>
+
+<slide class=""><hgroup><h2>大綱</h2></hgroup><article  id="section">
+
+<ul>
+<li>讀取CSV</li>
+<li><code>dplyr</code> 的Verbs簡介</li>
+<li>資料整合</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>讀取CSV</h2></hgroup><article  id="csv">
+
+</article></slide><slide class=""><hgroup><h2>CSV的格式</h2></hgroup><article  id="csv-1">
+
+<ul>
+<li>CSV: Comma-Separated Values</li>
+</ul>
+
+<p><img src='img/%E6%93%B7%E5%8F%96%E9%81%B8%E5%8F%96%E5%8D%80%E5%9F%9F_008.png' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2><code>read.csv</code></h2></hgroup><article  id="read.csv">
+
+<pre class = 'prettyprint lang-r'>read.csv(&quot;http://homepage.ntu.edu.tw/~wush978/rdataengineer/district_location.csv&quot;, 
+         header = TRUE, nrows = 6)</pre>
+
+<pre >##       行政區名 X_x0033_碼郵遞區號 中心點經度 中心點緯度
+## 1 臺北市中正區                100   121.5199   25.03240
+## 2 臺北市大同區                103   121.5130   25.06342
+## 3 臺北市中山區                104   121.5382   25.06970
+## 4 臺北市松山區                105   121.5576   25.05999
+## 5 臺北市大安區                106   121.5434   25.02677
+## 6 臺北市萬華區                108   121.4980   25.02859
+##                                                                                                                       TGOS_URL
+## 1 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 2 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 3 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 4 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 5 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 6 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>read.table</code></h2></hgroup><article  id="read.table">
+
+<pre class = 'prettyprint lang-r'>read.csv(&quot;http://homepage.ntu.edu.tw/~wush978/rdataengineer/district_location.csv&quot;, 
+         sep = &quot;,&quot;, header = TRUE, nrows = 6)</pre>
+
+<pre >##       行政區名 X_x0033_碼郵遞區號 中心點經度 中心點緯度
+## 1 臺北市中正區                100   121.5199   25.03240
+## 2 臺北市大同區                103   121.5130   25.06342
+## 3 臺北市中山區                104   121.5382   25.06970
+## 4 臺北市松山區                105   121.5576   25.05999
+## 5 臺北市大安區                106   121.5434   25.02677
+## 6 臺北市萬華區                108   121.4980   25.02859
+##                                                                                                                       TGOS_URL
+## 1 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 2 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 3 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 4 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 5 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false
+## 6 http://tgos.nat.gov.tw/tgos/Web/MetaData/TGOS_MetaData_View.aspx?MID=9C715A5CD330360D355AE105F908B29E&amp;SHOW_BACK_BUTTON=false</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>read.csv</code>與<code>read.table</code>的注意事項</h2></hgroup><article  id="read.csvread.table">
+
+<ul>
+<li>預設會把<code>character vector</code>轉成<code>factor</code>型態
+
+<ul>
+<li>可以用參數<code>stringsAsFactors</code>控制</li>
+</ul></li>
+<li>實務上，R會猜欄位的型態（是<code>character</code>, <code>numeric</code>還是呢？），這很慢
+
+<ul>
+<li>可以用參數<code>colClasses</code>直接告訴R答案，讀大資料會快很多</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>讀取<code>CSV</code>的可能錯誤：編碼問題</h2></hgroup><article  id="csv-2">
+
+<pre class = 'prettyprint lang-r'>read.csv(url(&quot;http://homepage.ntu.edu.tw/~wush978/rdataengineer/district_location.csv&quot;, encoding = &quot;BIG5&quot;), 
+         sep = &quot;,&quot;, header = TRUE, nrows = 6)</pre>
+
+<pre >## Warning in read.table(file = file, header = header, sep = sep, quote =
+## quote, : 輸入連結 &#39;http://homepage.ntu.edu.tw/~wush978/rdataengineer/
+## district_location.csv&#39; 中的輸入不正確</pre>
+
+<pre >## Warning in read.table(file = file, header = header, sep = sep, quote
+## = quote, : incomplete final line found by readTableHeader on &#39;http://
+## homepage.ntu.edu.tw/~wush978/rdataengineer/district_location.csv&#39;</pre>
+
+<pre >## [1] 銵
+## &lt;0 rows&gt; (or 0-length row.names)</pre>
+
+<ul>
+<li>解法：先用<code>readLines</code>處理或是用<code>readBin</code>處理後再讀取</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>讀取<code>CSV</code>的可能錯誤：欄位數量不一致</h2></hgroup><article  id="csv-3">
+
+<ul>
+<li>內文包含<code>&quot;,&quot;</code>或分隔符號</li>
+<li>資料有錯</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>read.csv(&quot;http://homepage.ntu.edu.tw/~wush978/rdataengineer/csv-error.csv&quot;)</pre>
+
+<pre >##                        NAME        ID
+## Wush Chi-Hsuan Wu d12345678          
+## Hsieh               Johnson d12345679</pre>
+
+<ul>
+<li>用<code>readLines</code>後手動用<code>strsplit</code>處理</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>小挑戰</h2></hgroup><article  id="section-1">
+
+<pre class = 'prettyprint lang-r'>x &lt;- readLines(&quot;http://homepage.ntu.edu.tw/~wush978/rdataengineer/csv-error.csv&quot;)</pre>
+
+<ul>
+<li>請用程式找出兩位的學號</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>讀取CSV檔案的小撇步: colClasses 參數</h2></hgroup><article  id="csv-colclasses-">
+
+<ul>
+<li><code>read.csv</code>與<code>read.table</code></li>
+<li><code>colClasses</code>參數可以加速</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'># source: https://support.spatialkey.com/spatialkey-sample-csv-data/
+path &lt;- tempfile(fileext = &quot;.csv.gz&quot;)
+download.file(&quot;http://homepage.ntu.edu.tw/~wush978/rdataengineer/FL_insurance_sample.csv.gz&quot;, destfile = path)</pre>
+
+</article></slide><slide class=""><hgroup><h2>讀取CSV檔案的小撇步: colClasses 參數</h2></hgroup><article  id="csv-colclasses--1">
+
+<pre class = 'prettyprint lang-r'>readLines(gzfile(path), n = 6)</pre>
+
+<pre >## [1] &quot;policyID,statecode,county,eq_site_limit,hu_site_limit,fl_site_limit,fr_site_limit,tiv_2011,tiv_2012,eq_site_deductible,hu_site_deductible,fl_site_deductible,fr_site_deductible,point_latitude,point_longitude,line,construction,point_granularity&quot;
+## [2] &quot;119736,FL,CLAY COUNTY,498960,498960,498960,498960,498960,792148.9,0,9979.2,0,0,30.102261,-81.711777,Residential,Masonry,1&quot;                                                                                                                         
+## [3] &quot;448094,FL,CLAY COUNTY,1322376.3,1322376.3,1322376.3,1322376.3,1322376.3,1438163.57,0,0,0,0,30.063936,-81.707664,Residential,Masonry,3&quot;                                                                                                             
+## [4] &quot;206893,FL,CLAY COUNTY,190724.4,190724.4,190724.4,190724.4,190724.4,192476.78,0,0,0,0,30.089579,-81.700455,Residential,Wood,1&quot;                                                                                                                      
+## [5] &quot;333743,FL,CLAY COUNTY,0,79520.76,0,0,79520.76,86854.48,0,0,0,0,30.063236,-81.707703,Residential,Wood,3&quot;                                                                                                                                            
+## [6] &quot;172534,FL,CLAY COUNTY,0,254281.5,0,254281.5,254281.5,246144.49,0,0,0,0,30.060614,-81.702675,Residential,Wood,1&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>system.time(
+  FL &lt;- read.csv(gzfile(path), header = TRUE)
+)</pre>
+
+<pre >##    user  system elapsed 
+##   0.288   0.010   0.298</pre>
+
+</article></slide><slide class=""><hgroup><h2>讀取CSV檔案的小撇步: colClasses 參數</h2></hgroup><article  id="csv-colclasses--2">
+
+<pre class = 'prettyprint lang-r'>system.time({
+  FL.head &lt;- read.csv(gzfile(&quot;FL_insurance_sample.csv.gz&quot;), header = TRUE, nrows = 6)
+  .col &lt;- sapply(FL.head, class)
+  .col[.col == &quot;integer&quot;] &lt;- &quot;numeric&quot;
+  FL &lt;- read.csv(gzfile(&quot;FL_insurance_sample.csv.gz&quot;), header = TRUE, colClasses = .col)
+})</pre>
+
+<pre >##    user  system elapsed 
+##   0.170   0.008   0.184</pre>
+
+</article></slide><slide class=""><hgroup><h2>讀取CSV檔案的小撇步: colClasses 參數</h2></hgroup><article  id="csv-colclasses--3">
+
+<pre class = 'prettyprint lang-r'>head(FL)</pre>
+
+<pre >##   policyID statecode      county eq_site_limit hu_site_limit fl_site_limit
+## 1   119736        FL CLAY COUNTY      498960.0     498960.00      498960.0
+## 2   448094        FL CLAY COUNTY     1322376.3    1322376.30     1322376.3
+## 3   206893        FL CLAY COUNTY      190724.4     190724.40      190724.4
+## 4   333743        FL CLAY COUNTY           0.0      79520.76           0.0
+## 5   172534        FL CLAY COUNTY           0.0     254281.50           0.0
+## 6   785275        FL CLAY COUNTY           0.0     515035.62           0.0
+##   fr_site_limit   tiv_2011   tiv_2012 eq_site_deductible
+## 1      498960.0  498960.00  792148.90                  0
+## 2     1322376.3 1322376.30 1438163.57                  0
+## 3      190724.4  190724.40  192476.78                  0
+## 4           0.0   79520.76   86854.48                  0
+## 5      254281.5  254281.50  246144.49                  0
+## 6           0.0  515035.62  884419.17                  0
+##   hu_site_deductible fl_site_deductible fr_site_deductible point_latitude
+## 1             9979.2                  0                  0       30.10226
+## 2                0.0                  0                  0       30.06394
+## 3                0.0                  0                  0       30.08958
+## 4                0.0                  0                  0       30.06324
+## 5                0.0                  0                  0       30.06061
+## 6                0.0                  0                  0       30.06324
+##   point_longitude        line construction point_granularity
+## 1       -81.71178 Residential      Masonry                 1
+## 2       -81.70766 Residential      Masonry                 3
+## 3       -81.70046 Residential         Wood                 1
+## 4       -81.70770 Residential         Wood                 3
+## 5       -81.70267 Residential         Wood                 1
+## 6       -81.70770 Residential      Masonry                 3</pre>
+
+</article></slide><slide class=""><hgroup><h2>Database</h2></hgroup><article  id="database">
+
+<ul>
+<li>作業在 Windows 上的 3.5 系列有bug，修復中
+
+<ul>
+<li>請Windows使用者用別的版本的R跑作業</li>
+</ul></li>
+<li>什麼時候用 Database?
+
+<ul>
+<li>記憶體不夠</li>
+<li>需要Transaction(多個操作中，只要一個失敗就全部復原)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Transaction</h2></hgroup><article  id="transaction">
+
+<ul>
+<li>線上的資料處理上，在「容錯」上非常重要的「特性」</li>
+<li>範例：
+
+<ul>
+<li>假設每小時產生一個檔案</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>out.path &lt;- sprintf(&quot;%s.csv&quot;, format(Sys.time(), &quot;%Y-%m-%d-%H&quot;))
+# do something
+write(data, file = out.path)</pre>
+
+</article></slide><slide class=""><hgroup><h2>Transaction</h2></hgroup><article  id="transaction-1">
+
+<ul>
+<li>線上的資料處理上，在「容錯」上非常重要的「特性」</li>
+<li>範例：
+
+<ul>
+<li>假設每小時產生一個檔案</li>
+<li>寫入到一半的時候發生錯誤（斷電、當機）</li>
+<li>自動重開機後又繼續跑，產生新的檔案</li>
+<li>哪些檔案是錯的？</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Transaction</h2></hgroup><article  id="transaction-2">
+
+<pre class = 'prettyprint lang-r'>out.path &lt;- format(Sys.time(), &quot;%Y-%m-%d-%H.csv&quot;)
+out.path.tmp &lt;- paste(out.path, &quot;tmp&quot;, sep = &quot;.&quot;)
+write(data, file = out.path.tmp)
+# rename is transaction
+file.rename(out.path.tmp, out.path)</pre>
+
+</article></slide><slide class=""><hgroup><h2>XML Tables</h2></hgroup><article  id="xml-tables">
+
+<ul>
+<li><code>XML::readHTMLTable</code></li>
+<li><code>XML</code> 是比較老牌的XML處理工具
+
+<ul>
+<li>資料結構比<code>xml2</code>更難懂，但是比較穩(?)</li>
+<li>如果資料來源是結構化的HTML表格，<code>XML::readHTMLTable</code>很方便</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>2018 縣市長大選台北即時估票</h2></hgroup><article  id="section-2">
+
+<ul>
+<li><a href='https://gist.github.com/wush978/1619ddb3ed093a11febb0da592f5fc9d' title=''>外差估票程式</a>
+
+<ol>
+<li>從中選會的網頁上抓候選人的得票數</li>
+<li>利用各正區現有的得票率當機準，依照「已開票」與「未開票」的比率放大</li>
+<li>推估最終候選人的得票</li>
+<li>可惜現在網頁格式不一致，所以會跑出NA XD</li>
+</ol></li>
+<li><a href='https://www.facebook.com/wush978/posts/2194489713895986' title=''>紀錄</a></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>data.frame</h2></hgroup><article  id="data.frame">
+
+<ul>
+<li>由list物件擴充而成
+
+<ul>
+<li>list + attributes</li>
+</ul></li>
+<li>在R 語言中，處理「表格」(table)資料
+
+<ul>
+<li>表格 v.s. 矩陣、陣列</li>
+</ul></li>
+<li>視覺化：ggplot2</li>
+<li>許多進階分析的入口
+
+<ul>
+<li>例：迴歸分析(<code>lm</code>)</li>
+<li>將表格的變數轉換成數學上的矩陣：<code>model.matrix</code> \(\hat{\beta} = (X^TX)^{-1}(X^Ty)\)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Create</h2></hgroup><article  id="data.frame--create">
+
+<ul>
+<li>注意參數： <code>stringsAsFactors</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>data.frame(student.id = 1:5, math.score = rpois(5, 5))</pre>
+
+<pre >##   student.id math.score
+## 1          1          3
+## 2          2          8
+## 3          3          3
+## 4          4          4
+## 5          5          5</pre>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Create</h2></hgroup><article  id="data.frame--create-1">
+
+<pre class = 'prettyprint lang-r'>df &lt;- read.csv(
+  url(&quot;https://raw.githubusercontent.com/wush978/DataScienceAndR/course/01-RBasic-07-Loading-Dataset/A_LVR_LAND_A.CSV&quot;, encoding = &quot;BIG5&quot;), 
+  nrows = 6, header = TRUE)
+df[,1:3]</pre>
+
+<pre >##   鄉鎮市區        交易標的                土地區段位置或建物區門牌
+## 1   文山區 房地(土地+建物) 臺北市文山區木柵路二段109巷100弄61~90號
+## 2   中正區 房地(土地+建物)                臺北市中正區南海路1~30號
+## 3   中正區 房地(土地+建物)       臺北市中正區重慶南路三段121~150號
+## 4   文山區 房地(土地+建物)        臺北市文山區指南路三段32巷1~30號
+## 5   文山區 房地(土地+建物)   臺北市文山區羅斯福路五段92巷1弄1~30號
+## 6   文山區 房地(土地+建物)            臺北市文山區秀明路二段1~30號</pre>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Read</h2></hgroup><article  id="data.frame--read">
+
+<ul>
+<li>list的Read: <code>[</code>、<code>[[</code>與<code>$</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>df[&quot;鄉鎮市區&quot;]</pre>
+
+<pre >##   鄉鎮市區
+## 1   文山區
+## 2   中正區
+## 3   中正區
+## 4   文山區
+## 5   文山區
+## 6   文山區</pre>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Read</h2></hgroup><article  id="data.frame--read-1">
+
+<ul>
+<li>list的Read: <code>[</code>、<code>[[</code>與<code>$</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>df[[&quot;鄉鎮市區&quot;]]</pre>
+
+<pre >## [1] 文山區 中正區 中正區 文山區 文山區 文山區
+## Levels: 文山區 中正區</pre>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Read</h2></hgroup><article  id="data.frame--read-2">
+
+<ul>
+<li>list的Read: <code>[</code>、<code>[[</code>與<code>$</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>df$`鄉鎮市區`</pre>
+
+<pre >## [1] 文山區 中正區 中正區 文山區 文山區 文山區
+## Levels: 文山區 中正區</pre>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Read</h2></hgroup><article  id="data.frame--read-3">
+
+<ul>
+<li><code>[</code>: 仍然是data.frame</li>
+<li><code>[[</code>、<code>$</code>: data.frame(list)會被打破</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Read</h2></hgroup><article  id="data.frame--read-4">
+
+<ul>
+<li>matrix的Read: <code>[</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>df[1,1]</pre>
+
+<pre >## [1] 文山區
+## Levels: 文山區 中正區</pre>
+
+<pre class = 'prettyprint lang-r'>df[1:2,1]</pre>
+
+<pre >## [1] 文山區 中正區
+## Levels: 文山區 中正區</pre>
+
+<pre class = 'prettyprint lang-r'>df[1,1:2]</pre>
+
+<pre >##   鄉鎮市區        交易標的
+## 1   文山區 房地(土地+建物)</pre>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Read</h2></hgroup><article  id="data.frame--read-5">
+
+<ul>
+<li>matrix的Read: <code>[</code>
+
+<ul>
+<li>應仍然是data.frame</li>
+<li>參數<code>drop = TRUE</code>(預設)當欄位方向的維度為1時，會自動把data.frame轉成向量</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>df[1:2,1:2]</pre>
+
+<pre >##   鄉鎮市區        交易標的
+## 1   文山區 房地(土地+建物)
+## 2   中正區 房地(土地+建物)</pre>
+
+<pre class = 'prettyprint lang-r'>df[1,1,drop = FALSE]</pre>
+
+<pre >##   鄉鎮市區
+## 1   文山區</pre>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Read</h2></hgroup><article  id="data.frame--read-6">
+
+<ul>
+<li><code>drop = TRUE</code> 是好事嘛？
+
+<ul>
+<li>Hadley 主導的 <a href='https://www.tidyverse.org/' title=''>tidyverse</a></li>
+<li>不是所有人都喜歡… <a href='https://stat.ethz.ch/pipermail/r-package-devel/2017q3/001896.html' title=''>tibbles are not data.frames</a></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Update</h2></hgroup><article  id="data.frame--update">
+
+<ul>
+<li><code>Read</code> + <code>&lt;-</code></li>
+</ul>
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>df &lt;- data.frame(
+  id = 1:5, 
+  score = sample(1:10, 5, TRUE))
+df</pre>
+
+<pre >##   id score
+## 1  1     4
+## 2  2     8
+## 3  3     5
+## 4  4     8
+## 5  5     5</pre>
+
+<pre class = 'prettyprint lang-r'>df$score &lt;- scale(df$score)
+df</pre>
+
+<pre >##   id      score
+## 1  1 -1.0690450
+## 2  2  1.0690450
+## 3  3 -0.5345225
+## 4  4  1.0690450
+## 5  5 -0.5345225</pre></div>
+
+</article></slide><slide class=""><hgroup><h2>data.frame 的 Delete</h2></hgroup><article  id="data.frame--delete">
+
+<ul>
+<li>反向Read</li>
+<li>Read + <code>&lt;- NULL</code></li>
+</ul>
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>df[-1,] # df[2:5,]</pre>
+
+<pre >##   id      score
+## 2  2  1.0690450
+## 3  3 -0.5345225
+## 4  4  1.0690450
+## 5  5 -0.5345225</pre>
+
+<pre class = 'prettyprint lang-r'>df$score &lt;- NULL
+df</pre>
+
+<pre >##   id
+## 1  1
+## 2  2
+## 3  3
+## 4  4
+## 5  5</pre></div>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-3">
+
+<ul>
+<li><code>iris</code>的資料中
+
+<ul>
+<li><code>Sepal.Length</code>的平均</li>
+<li>各種<code>Species</code>的平均<code>Sepal.Length</code></li>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是標準化後的<code>Sepal.Length</code></li>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是依照個別<code>Species</code>作標準化後的<code>Sepal.Length</code></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-4">
+
+<ul>
+<li>各種<code>Species</code>的平均<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>ans &lt;- c()
+for(.sp in levels(iris$Species)) {
+  .i &lt;- iris$Species == .sp
+  ans[.sp] &lt;- mean(iris$Sepal.Length[.i])
+}
+ans</pre>
+
+<pre >##     setosa versicolor  virginica 
+##      5.006      5.936      6.588</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-5">
+
+<ul>
+<li>各種<code>Species</code>的平均<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'># you can use `lapply` and then `unlist`
+sapply(levels(iris$Species), function(.sp) {
+  .i &lt;- iris$Species == .sp
+  mean(iris$Sepal.Length[.i])
+})</pre>
+
+<pre >##     setosa versicolor  virginica 
+##      5.006      5.936      6.588</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-6">
+
+<ul>
+<li>各種<code>Species</code>的平均<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- split(iris, iris$Species)
+. &lt;- lapply(., &quot;[[&quot;, &quot;Sepal.Length&quot;)
+sapply(., mean)</pre>
+
+<pre >##     setosa versicolor  virginica 
+##      5.006      5.936      6.588</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-7">
+
+<ul>
+<li>各種<code>Species</code>的平均<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>aggregate(Sepal.Length ~ Species, iris, mean)</pre>
+
+<pre >##      Species Sepal.Length
+## 1     setosa        5.006
+## 2 versicolor        5.936
+## 3  virginica        6.588</pre>
+
+<ul>
+<li>要理解這段expression，同學需要學會：
+
+<ul>
+<li><code>formula object</code></li>
+<li>Aggregation functions</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-8">
+
+<ul>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是標準化後的<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>ans &lt;- iris # to backup the original object, we modify after copying
+. &lt;- iris$Sepal.Length - mean(iris$Sepal.Length)
+. &lt;- . / sd(iris$Sepal.Length)
+ans$std.Sepal.Length &lt;- .
+ans[c(1,2,51,52,101,102),6,drop=FALSE]</pre>
+
+<pre >##     std.Sepal.Length
+## 1        -0.89767388
+## 2        -1.13920048
+## 51        1.39682886
+## 52        0.67224905
+## 101       0.55148575
+## 102      -0.05233076</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-9">
+
+<ul>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是標準化後的<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>ans &lt;- iris # to backup the original object, we modify after copying
+ans$std.Sepal.Length &lt;- scale(iris$Sepal.Length)
+ans[c(1,2,51,52,101,102),6,drop=FALSE]</pre>
+
+<pre >##     std.Sepal.Length
+## 1        -0.89767388
+## 2        -1.13920048
+## 51        1.39682886
+## 52        0.67224905
+## 101       0.55148575
+## 102      -0.05233076</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-10">
+
+<ul>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是依照個別<code>Species</code>作標準化後的<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- iris$Sepal.Length
+for(.sp in levels(iris$Species)) {
+  .i &lt;- iris$Species == .sp
+  .[.i] &lt;- scale(.[.i])
+}
+ans &lt;- iris
+ans$std.Sepal.Length &lt;- .
+ans[c(1,2,51,52,101,102),6,drop=FALSE]</pre>
+
+<pre >##     std.Sepal.Length
+## 1          0.2666745
+## 2         -0.3007180
+## 51         2.0613318
+## 52         0.8989266
+## 101       -0.4529159
+## 102       -1.2392283</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-11">
+
+<ul>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是依照個別<code>Species</code>作標準化後的<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'># This code will not work if the species is not ordered
+. &lt;- lapply(levels(iris$Species), function(.sp) {
+  .i &lt;- iris$Species == .sp
+  scale(iris$Sepal.Length[.i])
+})
+ans &lt;- iris
+ans$std.Sepal.Length &lt;- unlist(.)
+ans[c(1,2,51,52,101,102),6,drop=FALSE]</pre>
+
+<pre >##     std.Sepal.Length
+## 1          0.2666745
+## 2         -0.3007180
+## 51         2.0613318
+## 52         0.8989266
+## 101       -0.4529159
+## 102       -1.2392283</pre>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2><a href='https://cran.r-project.org/package=dplyr' title=''>dplyr</a></h2></hgroup><article  id="dplyr">
+
+</article></slide><slide class=""><hgroup><h2>參考SQL 資料庫系統對結構化資料的操作做設計</h2></hgroup><article  id="sql-">
+
+<ul>
+<li>一般企業儲存結構化資料的工具
+
+<ul>
+<li>儲存所有資料的工具</li>
+<li>Transaction: 操作要嘛成功，要嘛無效</li>
+</ul></li>
+<li>SQL 資料庫的結構與操作是有數學代數在背後(<a href='https://en.wikipedia.org/wiki/Relational_algebra' title=''>Relational Algebra</a>)</li>
+<li>R的data.frame v.s. SQL 資料庫
+
+<ul>
+<li>memory v.s. disk</li>
+<li>indexing</li>
+<li>column based v.s. row based</li>
+</ul></li>
+<li>一致的設計，讓同學可以透過<code>dplyr</code>的語法寫SQL
+
+<ul>
+<li>老師的經驗：比起用dplyr操作Database，還是直接寫 SQL 比較簡單… 但是可順便學SQL</li>
+<li>有SQL經驗的同學可以快速上手R 的data.frame</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>dplyr 沒有完全相容於 data.frame</h2></hgroup><article  id="dplyr--data.frame">
+
+<ul>
+<li>有時候，輸出的table不再是data.frame
+
+<ul>
+<li>為了效能</li>
+<li>為了設計</li>
+<li>因為Hadley(?)</li>
+</ul></li>
+<li>有必要時可以使用<code>as.data.frame</code></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Single Table verbs</h2></hgroup><article  id="single-table-verbs">
+
+<ul>
+<li>Read / Delete
+
+<ul>
+<li><code>filter</code>、<code>slice</code></li>
+<li><code>select</code></li>
+<li><code>sample_n</code>、<code>sample_frac</code></li>
+</ul></li>
+<li>Update
+
+<ul>
+<li><code>mutate</code></li>
+<li><code>arrange</code></li>
+</ul></li>
+<li>Others
+
+<ul>
+<li><code>summarise</code></li>
+<li><code>group_by</code></li>
+<li><code>do</code></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>針對列作篩選：filter</h2></hgroup><article  id="filter">
+
+<div class="columns-2" style="font-size-adjust:0.4;">
+<pre class = 'prettyprint lang-r'>head(iris[iris$Sepal.Length &gt; 3,1,drop=FALSE])</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre>
+
+<pre class = 'prettyprint lang-r'>head(filter(iris, Sepal.Length &gt; 3)[,1,drop=FALSE])</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre></div>
+
+</article></slide><slide class=""><hgroup><h2>針對列作篩選：filter</h2></hgroup><article  id="filter-1">
+
+<ul>
+<li>在<code>dplyr</code>的函數中，<code>iris$</code>可以被省略
+
+<ul>
+<li>解析順序：欄位名稱 –&gt; 變數名稱</li>
+</ul></li>
+<li><code>filter</code>的第一個參數是要處理的data.frame物件
+
+<ul>
+<li>所有的<code>dplyr</code>函數都是這樣設計</li>
+</ul></li>
+<li><code>filter</code>的其他參數必須是一個布林向量，並且長度一致
+
+<ul>
+<li>所有的這類參數，都是<code>TRUE</code>的位置，才會回傳</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>針對列作篩選：filter</h2></hgroup><article  id="filter-2">
+
+<pre class = 'prettyprint lang-r'>head(filter(iris, Sepal.Length &gt; 3, Sepal.Width &lt; 3.5))</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          4.9         3.0          1.4         0.2  setosa
+## 2          4.7         3.2          1.3         0.2  setosa
+## 3          4.6         3.1          1.5         0.2  setosa
+## 4          4.6         3.4          1.4         0.3  setosa
+## 5          5.0         3.4          1.5         0.2  setosa
+## 6          4.4         2.9          1.4         0.2  setosa</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對列作篩選：filter</h2></hgroup><article  id="filter-3">
+
+<pre class = 'prettyprint lang-r'>head(filter(iris, Sepal.Length &gt; 3, Sepal.Width &lt; 3.5, Species == &quot;versicolor&quot;))</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 1          7.0         3.2          4.7         1.4 versicolor
+## 2          6.4         3.2          4.5         1.5 versicolor
+## 3          6.9         3.1          4.9         1.5 versicolor
+## 4          5.5         2.3          4.0         1.3 versicolor
+## 5          6.5         2.8          4.6         1.5 versicolor
+## 6          5.7         2.8          4.5         1.3 versicolor</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對列作篩選：filter</h2></hgroup><article  id="filter-4">
+
+<pre class = 'prettyprint lang-r'>a &lt;- iris$Sepal.Length + iris$Sepal.Width
+head(filter(iris, Sepal.Length &gt; 3, Sepal.Width &lt; 3.5, a &lt; 8))</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          4.9         3.0          1.4         0.2  setosa
+## 2          4.7         3.2          1.3         0.2  setosa
+## 3          4.6         3.1          1.5         0.2  setosa
+## 4          4.4         2.9          1.4         0.2  setosa
+## 5          4.8         3.0          1.4         0.1  setosa
+## 6          4.3         3.0          1.1         0.1  setosa</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對列作篩選：slice</h2></hgroup><article  id="slice">
+
+<pre class = 'prettyprint lang-r'>slice(iris, 1:6)</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對列作抽樣：<code>sample_n</code>、<code>sample_frac</code></h2></hgroup><article  id="sample_nsample_frac">
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>sample_n(iris, 6)[,1,drop=FALSE]</pre>
+
+<pre >##   Sepal.Length
+## 1          5.6
+## 2          6.5
+## 3          4.4
+## 4          5.7
+## 5          6.1
+## 6          6.0</pre>
+
+<pre class = 'prettyprint lang-r'>sample_frac(iris, 0.04)[,1,drop=FALSE]</pre>
+
+<pre >##   Sepal.Length
+## 1          7.6
+## 2          6.3
+## 3          6.0
+## 4          6.3
+## 5          6.0
+## 6          6.6</pre></div>
+
+</article></slide><slide class=""><hgroup><h2>針對欄位作篩選：select</h2></hgroup><article  id="select">
+
+<pre class = 'prettyprint lang-r'>head(select(iris, Sepal.Length))</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對欄位作篩選：select</h2></hgroup><article  id="select-1">
+
+<pre class = 'prettyprint lang-r'>head(select(iris, Sepal.Length, Sepal.Width))</pre>
+
+<pre >##   Sepal.Length Sepal.Width
+## 1          5.1         3.5
+## 2          4.9         3.0
+## 3          4.7         3.2
+## 4          4.6         3.1
+## 5          5.0         3.6
+## 6          5.4         3.9</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對欄位作篩選：select</h2></hgroup><article  id="select-2">
+
+<pre class = 'prettyprint lang-r'>head(select(iris, starts_with(&quot;Sepal&quot;)))</pre>
+
+<pre >##   Sepal.Length Sepal.Width
+## 1          5.1         3.5
+## 2          4.9         3.0
+## 3          4.7         3.2
+## 4          4.6         3.1
+## 5          5.0         3.6
+## 6          5.4         3.9</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對欄位作篩選：select</h2></hgroup><article  id="select-3">
+
+<pre class = 'prettyprint lang-r'>head(select(iris, Sepal.Length:Petal.Length))</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length
+## 1          5.1         3.5          1.4
+## 2          4.9         3.0          1.4
+## 3          4.7         3.2          1.3
+## 4          4.6         3.1          1.5
+## 5          5.0         3.6          1.4
+## 6          5.4         3.9          1.7</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對欄位作篩選：select</h2></hgroup><article  id="select-4">
+
+<ul>
+<li>反向操作</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>head(select(iris, -Sepal.Length))</pre>
+
+<pre >##   Sepal.Width Petal.Length Petal.Width Species
+## 1         3.5          1.4         0.2  setosa
+## 2         3.0          1.4         0.2  setosa
+## 3         3.2          1.3         0.2  setosa
+## 4         3.1          1.5         0.2  setosa
+## 5         3.6          1.4         0.2  setosa
+## 6         3.9          1.7         0.4  setosa</pre>
+
+</article></slide><slide class=""><hgroup><h2>針對欄位作篩選：select</h2></hgroup><article  id="select-5">
+
+<ul>
+<li>rename</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>head(select(iris, SL = Sepal.Length))</pre>
+
+<pre >##    SL
+## 1 5.1
+## 2 4.9
+## 3 4.7
+## 4 4.6
+## 5 5.0
+## 6 5.4</pre>
+
+</article></slide><slide class=""><hgroup><h2>更改資料(向量化)</h2></hgroup><article  id="section-12">
+
+<ul>
+<li>mutate</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>head(mutate(iris, Sepal = mean(Sepal.Length + Sepal.Width)))</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species    Sepal
+## 1          5.1         3.5          1.4         0.2  setosa 8.900667
+## 2          4.9         3.0          1.4         0.2  setosa 8.900667
+## 3          4.7         3.2          1.3         0.2  setosa 8.900667
+## 4          4.6         3.1          1.5         0.2  setosa 8.900667
+## 5          5.0         3.6          1.4         0.2  setosa 8.900667
+## 6          5.4         3.9          1.7         0.4  setosa 8.900667</pre>
+
+</article></slide><slide class=""><hgroup><h2>更改資料(向量化)</h2></hgroup><article  id="section-13">
+
+<ul>
+<li>mutate</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>head(mutate(iris, Sepal.Length = as.character(Sepal.Length)))</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5            5         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: summarise</h2></hgroup><article  id="aggregation-summarise">
+
+<ul>
+<li>150 rows –&gt; 1 row</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>summarise(iris, mean(Sepal.Length))</pre>
+
+<pre >##   mean(Sepal.Length)
+## 1           5.843333</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: summarise</h2></hgroup><article  id="aggregation-summarise-1">
+
+<ul>
+<li>150 rows –&gt; 2 row? error</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>summarise(iris, range(Sepal.Length))</pre>
+
+<pre >## Error: Column `range(Sepal.Length)` must be length 1 (a summary value), not 2</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: do</h2></hgroup><article  id="aggregation-do">
+
+<ul>
+<li>150 rows –&gt; 2 row</li>
+<li><code>.</code> is <code>iris</code> here</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>do(iris, data.frame(rSL = range(.$Sepal.Length)))</pre>
+
+<pre >##   rSL
+## 1 4.3
+## 2 7.9</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation的目的</h2></hgroup><article  id="aggregation">
+
+<ul>
+<li>why <code>summarise</code>?</li>
+</ul>
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>summarise(iris, mean(Sepal.Length))[[1]]</pre>
+
+<pre >## [1] 5.843333</pre>
+
+<pre class = 'prettyprint lang-r'>mean(iris$Sepal.Length)</pre>
+
+<pre >## [1] 5.843333</pre></div>
+
+<ul>
+<li>Because <code>summarise</code>/<code>do</code> recognize <code>group_by</code></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: <code>group_by</code></h2></hgroup><article  id="aggregation-group_by">
+
+<ul>
+<li>Default <em>group</em> is <code>iris</code>
+
+<ul>
+<li><code>mutate</code>/<code>summarise</code>/<code>do</code> apply the expressions to the <code>group</code></li>
+</ul></li>
+<li>We can split <code>iris</code> to several groups based on specific (categorical) variable
+
+<ul>
+<li><code>character</code> or <code>factor</code></li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>group_by(iris, Species) # Nothing happens</pre>
+
+<pre >## # A tibble: 150 x 5
+## # Groups:   Species [3]
+##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+##           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;  
+##  1          5.1         3.5          1.4         0.2 setosa 
+##  2          4.9         3            1.4         0.2 setosa 
+##  3          4.7         3.2          1.3         0.2 setosa 
+##  4          4.6         3.1          1.5         0.2 setosa 
+##  5          5           3.6          1.4         0.2 setosa 
+##  6          5.4         3.9          1.7         0.4 setosa 
+##  7          4.6         3.4          1.4         0.3 setosa 
+##  8          5           3.4          1.5         0.2 setosa 
+##  9          4.4         2.9          1.4         0.2 setosa 
+## 10          4.9         3.1          1.5         0.1 setosa 
+## # … with 140 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: <code>group_by</code> + <code>summarise</code></h2></hgroup><article  id="aggregation-group_by-summarise">
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species)
+summarise(., mean(Sepal.Length))</pre>
+
+<pre >## # A tibble: 3 x 2
+##   Species    `mean(Sepal.Length)`
+##   &lt;fct&gt;                     &lt;dbl&gt;
+## 1 setosa                     5.01
+## 2 versicolor                 5.94
+## 3 virginica                  6.59</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>filter</code> –&gt; <code>group_by</code></h2></hgroup><article  id="filter-group_by">
+
+<pre class = 'prettyprint lang-r'>.x1 &lt;- filter(iris, Species == &quot;setosa&quot;)
+summarise(.x1, mean(Sepal.Length))</pre>
+
+<pre >##   mean(Sepal.Length)
+## 1              5.006</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>filter</code> –&gt; <code>group_by</code></h2></hgroup><article  id="filter-group_by-1">
+
+<pre class = 'prettyprint lang-r'>.x1 &lt;- filter(iris, Species == &quot;setosa&quot;)
+.x2 &lt;- filter(iris, Species == &quot;versicolor&quot;)
+.x3 &lt;- filter(iris, Species == &quot;virginica&quot;)
+rbind(
+  summarise(.x1, mean(Sepal.Length)),
+  summarise(.x2, mean(Sepal.Length)),
+  summarise(.x3, mean(Sepal.Length))
+)</pre>
+
+<pre >##   mean(Sepal.Length)
+## 1              5.006
+## 2              5.936
+## 3              6.588</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation</h2></hgroup><article  id="aggregation-1">
+
+<ul>
+<li>透過<code>group_by</code>把原本的data.frame切割成若干個groups</li>
+<li>之後的verbs會各自對個別的groups運作，一個group跑一次(會有多個data.frame)，最後再<code>rbind</code>成為單一的data.frame</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: <code>group_by</code> + <code>summarise</code></h2></hgroup><article  id="aggregation-group_by-summarise-1">
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species)
+summarise(., mean(Sepal.Length), mean(Sepal.Width))</pre>
+
+<pre >## # A tibble: 3 x 3
+##   Species    `mean(Sepal.Length)` `mean(Sepal.Width)`
+##   &lt;fct&gt;                     &lt;dbl&gt;               &lt;dbl&gt;
+## 1 setosa                     5.01                3.43
+## 2 versicolor                 5.94                2.77
+## 3 virginica                  6.59                2.97</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: <code>group_by</code> + <code>summarise</code></h2></hgroup><article  id="aggregation-group_by-summarise-2">
+
+<ul>
+<li>結果的維度： <code>group 的數量</code> \(\times\) ?
+
+<ul>
+<li>?是所有在資料中出現的組合的個數</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species, floor(Petal.Length))
+summarise(., mean(Sepal.Length), mean(Sepal.Width))</pre>
+
+<pre >## # A tibble: 7 x 4
+## # Groups:   Species [3]
+##   Species    `floor(Petal.Length)` `mean(Sepal.Length)` `mean(Sepal.Width)`
+##   &lt;fct&gt;                      &lt;dbl&gt;                &lt;dbl&gt;               &lt;dbl&gt;
+## 1 setosa                         1                 5.01                3.43
+## 2 versicolor                     3                 5.35                2.49
+## 3 versicolor                     4                 6.09                2.85
+## 4 versicolor                     5                 6.35                2.85
+## 5 virginica                      4                 5.85                2.8 
+## 6 virginica                      5                 6.44                2.94
+## 7 virginica                      6                 7.43                3.16</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: <code>group_by</code> + <code>do</code></h2></hgroup><article  id="aggregation-group_by-do">
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species)
+do(., data.frame(type = c(&quot;min&quot;, &quot;max&quot;), r1 = range(.$Sepal.Length), r2 = range(.$Sepal.Width)))</pre>
+
+<pre >## # A tibble: 6 x 4
+## # Groups:   Species [3]
+##   Species    type     r1    r2
+##   &lt;fct&gt;      &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 setosa     min     4.3   2.3
+## 2 setosa     max     5.8   4.4
+## 3 versicolor min     4.9   2  
+## 4 versicolor max     7     3.4
+## 5 virginica  min     4.9   2.2
+## 6 virginica  max     7.9   3.8</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: <code>group_by</code> + <code>summarise</code></h2></hgroup><article  id="aggregation-group_by-summarise-3">
+
+<ul>
+<li>利用<code>browser</code>詳細了解<code>group_by</code>與<code>summarise</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species)
+summarise(., SL = {
+  browser()
+  mean(Sepal.Length)
+})</pre>
+
+</article></slide><slide class=""><hgroup><h2>Aggregation: <code>group_by</code> + <code>do</code></h2></hgroup><article  id="aggregation-group_by-do-1">
+
+<ul>
+<li>利用<code>browser</code>詳細了解<code>group_by</code>與<code>do</code></li>
+<li>在中斷點(<code>Browser[1]&gt;</code>之下)可檢閱變數<code>.</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species)
+do(., {
+  browser()
+  data.frame(r1 = range(Sepal.Length))
+})</pre>
+
+</article></slide><slide class=""><hgroup><h2>小挑戰</h2></hgroup><article  id="section-14">
+
+<ul>
+<li>請嘗試用<code>dplyr</code>的函數，從<code>iris</code>的資料中計算：
+
+<ul>
+<li><code>Sepal.Length</code>的平均(<code>mean</code>)</li>
+<li>各種<code>Species</code>的平均<code>Sepal.Length</code>(<code>mean</code>)</li>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是標準化後的<code>Sepal.Length</code>(<code>scale</code>)</li>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是依照個別<code>Species</code>作標準化後的<code>Sepal.Length</code>(<code>scale</code>)</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>參考答案</h2></hgroup><article  id="section-15">
+
+<ul>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是標準化後的<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>mutate(iris, std.Sepal.Length = scale(Sepal.Length))[c(1,2,51,52,101,102),4:6]</pre>
+
+<pre >##     Petal.Width    Species std.Sepal.Length
+## 1           0.2     setosa      -0.89767388
+## 2           0.2     setosa      -1.13920048
+## 51          1.4 versicolor       1.39682886
+## 52          1.5 versicolor       0.67224905
+## 101         2.5  virginica       0.55148575
+## 102         1.9  virginica      -0.05233076</pre>
+
+</article></slide><slide class=""><hgroup><h2>參考答案</h2></hgroup><article  id="section-16">
+
+<ul>
+<li>建立新的欄位：<code>std.Sepal.Length</code>是依照個別<code>Species</code>作標準化後的<code>Sepal.Length</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species)
+mutate(., std.Sepal.Length = scale(Sepal.Length))[c(1,2,51,52,101,102),4:6]</pre>
+
+<pre >## # A tibble: 6 x 3
+## # Groups:   Species [3]
+##   Petal.Width Species    std.Sepal.Length
+##         &lt;dbl&gt; &lt;fct&gt;                 &lt;dbl&gt;
+## 1         0.2 setosa                0.267
+## 2         0.2 setosa               -0.301
+## 3         1.4 versicolor            2.06 
+## 4         1.5 versicolor            0.899
+## 5         2.5 virginica            -0.453
+## 6         1.9 virginica            -1.24</pre>
+
+</article></slide><slide class=""><hgroup><h2>從<code>dplyr</code>到SQL</h2></hgroup><article  id="dplyrsql">
+
+<ul>
+<li>每一個Single Table Verbs會對到SQL Keyword, Ex:
+
+<ul>
+<li><code>select</code> –&gt; <code>SELECT</code></li>
+<li><code>filter</code> –&gt; <code>WHERE</code></li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>從<code>dplyr</code>到SQL</h2></hgroup><article  id="dplyrsql-1">
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>suppressPackageStartupMessages(
+  library(sqldf)
+  )
+sqldf(&quot;
+SELECT `Sepal.Length` FROM iris 
+WHERE Species = &#39;setosa&#39; LIMIT 6&quot;
+)</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre>
+
+<p><br/></p>
+
+<pre class = 'prettyprint lang-r'>. &lt;- filter(iris, Species == &quot;setosa&quot;)
+. &lt;- select(., Sepal.Length)
+slice(., 1:6)</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre></div>
+
+</article></slide><slide class=""><hgroup><h2>從<code>dplyr</code>到SQL</h2></hgroup><article  id="dplyrsql-2">
+
+<ul>
+<li>同學仍然需要找機會學習SQL的expression規則
+
+<ul>
+<li>SQL 在資料科學是比 R 還重要的存在</li>
+<li>懂 dplyr 後學 SQL 的概念會很快，因為背後的設計相同（把那些verbs換個名詞而已）</li>
+</ul></li>
+<li>SQL 和 GROUP BY 與 dplyr 的 group_by都是 aggregation functions
+
+<ul>
+<li>但是在R 中我們可以用中斷點作探索，更快的理解aggregation functions</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>從<code>dplyr</code>到SQL</h2></hgroup><article  id="dplyrsql-3">
+
+<pre class = 'prettyprint lang-r'>suppressPackageStartupMessages(library(dbplyr))
+library(RSQLite)
+src &lt;- src_sqlite(tempfile(fileext = &quot;.db&quot;), create = TRUE)
+copy_to(src, iris)
+iris.db &lt;- tbl(src, &quot;iris&quot;)
+filter(iris.db, Species == &quot;versicolor&quot;)</pre>
+
+<pre >## # Source:   lazy query [?? x 5]
+## # Database: sqlite 3.22.0
+## #   [/var/folders/x6/z8_v_l4x1qjdwmzkc98sj0lw0000gp/T//Rtmp45nxGb/file1858c189d9a62.db]
+##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species   
+##           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;chr&gt;     
+##  1          7           3.2          4.7         1.4 versicolor
+##  2          6.4         3.2          4.5         1.5 versicolor
+##  3          6.9         3.1          4.9         1.5 versicolor
+##  4          5.5         2.3          4           1.3 versicolor
+##  5          6.5         2.8          4.6         1.5 versicolor
+##  6          5.7         2.8          4.5         1.3 versicolor
+##  7          6.3         3.3          4.7         1.6 versicolor
+##  8          4.9         2.4          3.3         1   versicolor
+##  9          6.6         2.9          4.6         1.3 versicolor
+## 10          5.2         2.7          3.9         1.4 versicolor
+## # … with more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2>從<code>dplyr</code>到SQL</h2></hgroup><article  id="dplyrsql-4">
+
+<ul>
+<li>aggregation 會受到 database 的限制</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>suppressPackageStartupMessages(library(dbplyr))
+library(RSQLite)
+src &lt;- src_sqlite(tempfile(fileext = &quot;.db&quot;), create = TRUE)
+copy_to(src, iris)
+iris.db &lt;- tbl(src, &quot;iris&quot;)
+. &lt;- group_by(iris.db, Species)
+do(., data.frame(r1 = range(.$Sepal.Length)))</pre>
+
+<pre >## Error: No more ticks</pre>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Table 的種類</h2></hgroup><article  id="table-">
+
+</article></slide><slide class=""><hgroup><h2>Wide Table</h2></hgroup><article  id="wide-table">
+
+<ul>
+<li>row is an instance</li>
+<li>columns are attributes</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>df.wide &lt;- data.frame(
+  id = c(&quot;Bob&quot;, &quot;John&quot;, &quot;Anderson&quot;), 
+  math = c(80, 85, 90), 
+  science = c(75, 60, 100)
+  )
+df.wide</pre>
+
+<pre >##         id math science
+## 1      Bob   80      75
+## 2     John   85      60
+## 3 Anderson   90     100</pre>
+
+</article></slide><slide class=""><hgroup><h2>Tall Table</h2></hgroup><article  id="tall-table">
+
+<ul>
+<li>又稱為 narrow 或 stacked data</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(reshape2)
+df.tall &lt;- melt(df.wide, variable.name = &quot;subject&quot;, value.name = &quot;score&quot;)</pre>
+
+<pre >## Using id as id variables</pre>
+
+<pre class = 'prettyprint lang-r'>df.tall</pre>
+
+<pre >##         id subject score
+## 1      Bob    math    80
+## 2     John    math    85
+## 3 Anderson    math    90
+## 4      Bob science    75
+## 5     John science    60
+## 6 Anderson science   100</pre>
+
+</article></slide><slide class=""><hgroup><h2>Tall Table –&gt; Wide Table (Pivoting)</h2></hgroup><article  id="tall-table-wide-table-pivoting">
+
+<pre class = 'prettyprint lang-r'>library(reshape2)
+dcast(df.tall, id ~ subject)</pre>
+
+<pre >## Using score as value column: use value.var to override.</pre>
+
+<pre >##         id math science
+## 1 Anderson   90     100
+## 2      Bob   80      75
+## 3     John   85      60</pre>
+
+<pre class = 'prettyprint lang-r'># stats::reshape(df.tall, idvar = &quot;id&quot;, 
+#   v.names = &quot;score&quot;, timevar = &quot;subject&quot;, 
+#   direction = &quot;wide&quot;)</pre>
+
+<ul>
+<li>wide table 在現實生活很常見，但是會有什麼問題呢？</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>wide table 的限制，以ggplot2為例</h2></hgroup><article  id="wide-table-ggplot2">
+
+<ul>
+<li>在<code>df.wide</code>上比較math 或 science 很容易</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+ggplot(df.wide, aes(x = id, y = math)) +
+  geom_bar(stat = &quot;identity&quot;)</pre>
+
+<p><img src="Structured-Data_files/figure-html/wide.ggplot2-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>wide table 的限制，以ggplot2為例</h2></hgroup><article  id="wide-table-ggplot2-1">
+
+<ul>
+<li>但是怎麼同時比較 <code>math</code> 與 <code>science</code>?</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>範例：ggplot2</h2></hgroup><article  id="ggplot2">
+
+<ul>
+<li>ggplot2 is more friendly to tall table</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+ggplot(df.tall, aes(x = id, y = score, fill = subject)) +
+  geom_bar(stat = &quot;identity&quot;)</pre>
+
+<p><img src="Structured-Data_files/figure-html/tall.ggplot2-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>Wide Table –&gt; Tall Table</h2></hgroup><article  id="wide-table-tall-table">
+
+<pre class = 'prettyprint lang-r'>library(reshape2)
+df.tall &lt;- melt(df.wide, variable.name = &quot;subject&quot;, value.name = &quot;score&quot;)</pre>
+
+</article></slide><slide class=""><hgroup><h2>Wide Table –&gt; Tall Table</h2></hgroup><article  id="wide-table-tall-table-1">
+
+<pre class = 'prettyprint lang-r'>. &lt;- iris
+.$id &lt;- rownames(iris)
+iris.tall &lt;- melt(
+  ., variable.name = &quot;measurement&quot;, value.name = &quot;value&quot;, 
+  id.vars = &quot;id&quot;, stringsAsFactors = FALSE)</pre>
+
+<pre >## Warning: attributes are not identical across measure variables; they will
+## be dropped</pre>
+
+<pre class = 'prettyprint lang-r'>filter(iris.tall, id == &quot;1&quot;)</pre>
+
+<pre >##   id  measurement  value
+## 1  1 Sepal.Length    5.1
+## 2  1  Sepal.Width    3.5
+## 3  1 Petal.Length    1.4
+## 4  1  Petal.Width    0.2
+## 5  1      Species setosa</pre>
+
+</article></slide><slide class=""><hgroup><h2>Wide Table v.s. Tall Table</h2></hgroup><article  id="wide-table-v.s.-tall-table">
+
+<ul>
+<li>Wide Table 每一列要對應到一個instance</li>
+<li>Tall Table 要有一個欄位（會重複）代表identity
+
+<ul>
+<li>相同的identity代表相同的instance</li>
+</ul></li>
+<li>我不知道對於這兩種table的嚴謹定義。實務上，也是有Table會介於兩者之間</li>
+<li>重點在於了解wide table與tall table適合使用的情境
+
+<ul>
+<li>必要時需要作轉型</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>df.tall</pre>
+
+<pre >##         id subject score
+## 1      Bob    math    80
+## 2     John    math    85
+## 3 Anderson    math    90
+## 4      Bob science    75
+## 5     John science    60
+## 6 Anderson science   100</pre>
+
+</article></slide><slide class=""><hgroup><h2>小挑戰</h2></hgroup><article  id="section-17">
+
+<ul>
+<li>請問<code>iris</code>算是 wide table 還是 tall table?</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>slice(iris, c(1, 2, 51, 52, 101, 102))</pre>
+
+<pre >##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+## 1          5.1         3.5          1.4         0.2     setosa
+## 2          4.9         3.0          1.4         0.2     setosa
+## 3          7.0         3.2          4.7         1.4 versicolor
+## 4          6.4         3.2          4.5         1.5 versicolor
+## 5          6.3         3.3          6.0         2.5  virginica
+## 6          5.8         2.7          5.1         1.9  virginica</pre>
+
+</article></slide><slide class=""><hgroup><h2>小挑戰</h2></hgroup><article  id="section-18">
+
+<ul>
+<li>請問<code>cars</code>算是 wide table 還是 tall table?</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>cars</pre>
+
+<pre >##    speed dist
+## 1      4    2
+## 2      4   10
+## 3      7    4
+## 4      7   22
+## 5      8   16
+## 6      9   10
+## 7     10   18
+## 8     10   26
+## 9     10   34
+## 10    11   17
+## 11    11   28
+## 12    12   14
+## 13    12   20
+## 14    12   24
+## 15    12   28
+## 16    13   26
+## 17    13   34
+## 18    13   34
+## 19    13   46
+## 20    14   26
+## 21    14   36
+## 22    14   60
+## 23    14   80
+## 24    15   20
+## 25    15   26
+## 26    15   54
+## 27    16   32
+## 28    16   40
+## 29    17   32
+## 30    17   40
+## 31    17   50
+## 32    18   42
+## 33    18   56
+## 34    18   76
+## 35    18   84
+## 36    19   36
+## 37    19   46
+## 38    19   68
+## 39    20   32
+## 40    20   48
+## 41    20   52
+## 42    20   56
+## 43    20   64
+## 44    22   66
+## 45    23   54
+## 46    24   70
+## 47    24   92
+## 48    24   93
+## 49    24  120
+## 50    25   85</pre>
+
+</article></slide><slide class=""><hgroup><h2>Wide Table v.s. Tall Table</h2></hgroup><article  id="wide-table-v.s.-tall-table-1">
+
+<ul>
+<li>Wide Table的好處
+
+<ul>
+<li>比較容易閱讀、空間比較省</li>
+<li>適合作aggregation</li>
+<li>適合作modeling</li>
+</ul></li>
+<li>Tall Table的好處
+
+<ul>
+<li>增加測量的類型時，不用對舊的資料造成破壞</li>
+<li>ggplot2</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>對<code>iris</code>計算各個Species的平均</h2></hgroup><article  id="irisspecies">
+
+<pre class = 'prettyprint lang-r'>. &lt;- group_by(iris, Species)
+summarise_all(., mean)</pre>
+
+<pre >## # A tibble: 3 x 5
+##   Species    Sepal.Length Sepal.Width Petal.Length Petal.Width
+##   &lt;fct&gt;             &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+## 1 setosa             5.01        3.43         1.46       0.246
+## 2 versicolor         5.94        2.77         4.26       1.33 
+## 3 virginica          6.59        2.97         5.55       2.03</pre>
+
+</article></slide><slide class=""><hgroup><h2>對<code>iris.tall</code>計算各個Species的平均</h2></hgroup><article  id="iris.tallspecies">
+
+<pre class = 'prettyprint lang-r'>species &lt;- filter(iris.tall, measurement == &quot;Species&quot;)
+species &lt;- unique(species$value)
+measurements &lt;- unique(iris.tall$measurement)
+measurements &lt;- as.character(measurements)
+measurements &lt;- setdiff(measurements, &quot;Species&quot;)
+result &lt;- data.frame(
+  Species = species
+)
+for(m in measurements) {
+  result[[m]] &lt;- numeric(nrow(result))
+}
+for(i in 1:length(species)) {
+  current.species &lt;- filter(iris.tall, measurement == &quot;Species&quot;, value == species[i])
+  #.$id
+  for(j in c(&quot;Sepal.Length&quot;, &quot;Sepal.Width&quot;, &quot;Petal.Length&quot;, &quot;Petal.Width&quot;)) {
+    . &lt;- filter(iris.tall, measurement == j, id %in% current.species$id)
+    result[[j]][i] &lt;- mean(as.numeric(.$value))
+  }
+}</pre>
+
+</article></slide><slide class=""><hgroup><h2>對<code>iris.tall</code>計算各個Species的平均</h2></hgroup><article  id="iris.tallspecies-1">
+
+<pre class = 'prettyprint lang-r'>. &lt;- stats::reshape(
+  iris.tall, v.names = &quot;value&quot;, 
+  timevar = &quot;measurement&quot;, direction = &quot;wide&quot;)
+. &lt;- select(., value.Sepal.Length : value.Species)
+for(j in 1:4) {
+  .[[j]] &lt;- as.numeric(.[[j]])
+}
+. &lt;- group_by(., value.Species)
+summarise_all(., mean)</pre>
+
+<pre >## # A tibble: 3 x 5
+##   value.Species value.Sepal.Len… value.Sepal.Wid… value.Petal.Len…
+##   &lt;chr&gt;                    &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 setosa                    5.01             3.43             1.46
+## 2 versicolor                5.94             2.77             4.26
+## 3 virginica                 6.59             2.97             5.55
+## # … with 1 more variable: value.Petal.Width &lt;dbl&gt;</pre>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>pipeline operator</h2></hgroup><article  id="pipeline-operator">
+
+</article></slide><slide class=""><hgroup><h2>資料處理就是一個連續組合動作</h2></hgroup><article  id="section-19">
+
+<pre class = 'prettyprint lang-r'>. &lt;- filter(iris, Species == &quot;setosa&quot;)
+. &lt;- select(., Sepal.Length)
+head(., 6)</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre>
+
+</article></slide><slide class=""><hgroup><h2>運用中間變數</h2></hgroup><article  id="section-20">
+
+<ul>
+<li><code>.</code> 永遠是中間變數，不會混用
+
+<ul>
+<li>常見的還有<code>x</code>、<code>y</code>、<code>i</code>…</li>
+<li>但是中間變數的名字越多，越容易混淆</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>for(i in ...) {
+  ...
+  for(i in ...) { # i is duplicated
+    ... 
+  }
+  ... # i has been changed
+}</pre>
+
+</article></slide><slide class=""><hgroup><h2>解決辦法：保持environment的乾淨</h2></hgroup><article  id="environment">
+
+<ul>
+<li>中間變數一律用<code>.</code>開頭
+
+<ul>
+<li>預設會隱藏這些變數</li>
+</ul></li>
+<li>nested function call</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>head(select(filter(iris, Species == &quot;setosa&quot;), Sepal.Length), 6)</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre>
+
+</article></slide><slide class=""><hgroup><h2>解決辦法：pipeline operator <code>%&gt;%</code></h2></hgroup><article  id="pipeline-operator-1">
+
+<ul>
+<li><code>%&gt;%</code>會把左邊的expression的結果，當成右邊函數呼叫的第一個參數
+
+<ul>
+<li>參數對應的方式：先比對名稱，再按照順序</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>filter(iris, Species == &quot;setosa&quot;) %&gt;%
+  select(Sepal.Length) %&gt;%
+  head(6)</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>%&gt;%</code> 細解</h2></hgroup><article  id="section-21">
+
+<pre class = 'prettyprint lang-r'># . &lt;- filter(iris, Species == &quot;setosa&quot;)
+filter(iris, Species == &quot;setosa&quot;) %&gt;%
+# . &lt;- select(., Sepal.Length)
+  select(Sepal.Length) %&gt;%
+# head(., 6)
+  head(6)</pre>
+
+<pre >##   Sepal.Length
+## 1          5.1
+## 2          4.9
+## 3          4.7
+## 4          4.6
+## 5          5.0
+## 6          5.4</pre>
+
+</article></slide><slide class=""><hgroup><h2>範例</h2></hgroup><article  id="section-22">
+
+<pre class = 'prettyprint lang-r'># . &lt;- group_by(iris, Species)
+group_by(iris, Species) %&gt;%
+# . &lt;- mutate(., std.Sepal.Length = scale(Sepal.Length))
+  mutate(std.Sepal.Length = scale(Sepal.Length)) %&gt;%
+# .[,4:6]  
+  `[`(,4:6)</pre>
+
+<pre >## # A tibble: 150 x 3
+## # Groups:   Species [3]
+##    Petal.Width Species std.Sepal.Length
+##          &lt;dbl&gt; &lt;fct&gt;              &lt;dbl&gt;
+##  1         0.2 setosa            0.267 
+##  2         0.2 setosa           -0.301 
+##  3         0.2 setosa           -0.868 
+##  4         0.2 setosa           -1.15  
+##  5         0.2 setosa           -0.0170
+##  6         0.4 setosa            1.12  
+##  7         0.3 setosa           -1.15  
+##  8         0.2 setosa           -0.0170
+##  9         0.2 setosa           -1.72  
+## 10         0.1 setosa           -0.301 
+## # … with 140 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>%&gt;%</code> 與 <code>.</code></h2></hgroup><article  id="section-23">
+
+<ul>
+<li><code>%&gt;%</code>左邊的運算結果，可以在右邊的expression中以<code>.</code>變數呼叫</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>sample(1:10) %&gt;% paste0(LETTERS[.])</pre>
+
+<pre >##  [1] &quot;5E&quot;  &quot;7G&quot;  &quot;4D&quot;  &quot;1A&quot;  &quot;6F&quot;  &quot;10J&quot; &quot;2B&quot;  &quot;9I&quot;  &quot;8H&quot;  &quot;3C&quot;</pre>
+
+<pre class = 'prettyprint lang-r'># . &lt;- sample(1:10)
+# paste0(., LETTERS[.])</pre>
+
+</article></slide><slide class=""><hgroup><h2>挑戰</h2></hgroup><article  id="section-24">
+
+<ul>
+<li>同學可以嘗試用pipeline operator來寫出清理資料的程式
+
+<ul>
+<li>在思考上，會和過去的經驗不太相同</li>
+<li>程式碼較容易閱讀與複製</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'># 我們想要複製 `select(., Sepal.Length)` 之後 `head(., 6)`這兩個動作
+head(select(filter(iris, Species == &quot;setosa&quot;), Sepal.Length), 6)
+# --&gt; 
+head(select(filter(iris, Species == &quot;versicolor&quot;), Sepal.Length), 6)
+filter(iris, Species == &quot;setosa&quot;) %&gt;%
+  select(Sepal.Length) %&gt;%
+  head(6)
+# --&gt;
+filter(iris, Species == &quot;versicolor&quot;) %&gt;%
+  select(Sepal.Length) %&gt;%
+  head(6)</pre>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>資料整合</h2></hgroup><article  id="section-25">
+
+</article></slide><slide class=""><hgroup><h2>資料科學團隊</h2></hgroup><article  id="section-26">
+
+<ol>
+<li>Hello World: Dashboard
+
+<ul>
+<li>資料清理</li>
+<li>檢查資料</li>
+<li>確認分析的方向</li>
+</ul></li>
+<li>Next Step: 資料整合
+
+<ul>
+<li>有怎麼樣的整合是過去沒有人試過的？</li>
+<li>分析資料就像是從水果（分析）中榨取果汁（價值）</li>
+<li>從沒被榨取過得資料中獲得價值更容易</li>
+</ul></li>
+</ol>
+
+<p><img src='img/hK35aAi.jpg.gif' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>資料整合的挑戰</h2></hgroup><article  id="section-27">
+
+<ul>
+<li>考驗著公司的資料工程成熟度</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>公司的資料工程等級</h2></hgroup><article  id="section-28">
+
+<h3>沒有資料工程，就沒有資料科學</h3>
+
+<ol>
+<li>Lv1: 有收集資料</li>
+<li>Lv2: 有即時的資料可以用</li>
+<li>Lv3: 有逐筆的資料可以用</li>
+<li>Lv4: 有建立即時模型(整合Lv2與Lv3)</li>
+</ol>
+
+</article></slide><slide class=""><hgroup><h2>Lv1: 有收集資料</h2></hgroup><article  id="lv1-">
+
+<ul>
+<li>有在收集數據
+
+<ul>
+<li>工廠的感測器的數據</li>
+<li>網站上使用者的行為紀錄</li>
+<li>手機的訊號紀錄</li>
+<li>網路裝置的訊號紀錄</li>
+<li>顧客的購買紀錄</li>
+<li>顧客的客訴紀錄</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Lv1: 有收集資料，但是沒有處理資料的架構</h2></hgroup><article  id="lv1--1">
+
+<ul>
+<li>數據有（暫時地）儲存到硬碟</li>
+<li>若需要檢查過去的數據，概念上辦得到，但是實際取出需要很長的時間</li>
+</ul>
+
+<p><img src='img/Data-LV1.png' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>Lv2: 有即時的資料可以用</h2></hgroup><article  id="lv2-">
+
+<ul>
+<li>場區過去一小時的平均溫度</li>
+<li>使用者的點擊次數累計</li>
+<li>顧客的購買次數、購買金額</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Lv2 實做</h2></hgroup><article  id="lv2--1">
+
+<ul>
+<li>若只要單純的功能，則不需要太大量的計算資源</li>
+<li>越要求穩定、可靠，則需要越多的資源</li>
+<li>可以做出Dashboard、可以跑統計、作趨勢的預測</li>
+</ul>
+
+<p><img src='img/Data-LV2.png' style='max-width: 75%; max-height: 75%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>Lv2: 沒有存取歷史資料的架構</h2></hgroup><article  id="lv2--2">
+
+<ul>
+<li>若需要檢查過去的數據，但是實際取出需要很長的時間</li>
+<li>任何改動都需要時間累計、無法回朔</li>
+<li>沒辦法跑深度的分析</li>
+<li>通常由工程師兼差維護資料系統</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Lv3: 有逐筆的資料可以用</h2></hgroup><article  id="lv3-">
+
+<ul>
+<li>提供存取歷史數據的架構
+
+<ul>
+<li>Hadoop</li>
+<li>Spark</li>
+</ul></li>
+</ul>
+
+<p><img src='img/640px-Mapreduce_Overview.svg.png' style='max-width: 100%; max-height: 100%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>Lv3: 有逐筆的資料可以用</h2></hgroup><article  id="lv3--1">
+
+<ul>
+<li>可以作大量數據的資料整合</li>
+<li>可以作線下的複雜模型分析、進行實驗</li>
+<li>由專職的團隊維護數據系統</li>
+</ul>
+
+<p><img src='img/Data-LV3.png' style='max-width: 75%; max-height: 75%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>資料工程之路</h2></hgroup><article  id="section-30">
+
+<ul>
+<li>程式之路：<strong>功能</strong>–&gt;效能–&gt;穩定</li>
+<li>資料工程的需求：有資料–&gt;<strong>能統計的資料</strong>–&gt;能整合的資料–&gt;能分析的資料–&gt;可靠的資料</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>dplyr two tables</h2></hgroup><article  id="dplyr-two-tables">
+
+</article></slide><slide class=""><hgroup><h2>nycflights13: Flights that Departed NYC in 2013</h2></hgroup><article  id="nycflights13-flights-that-departed-nyc-in-2013">
+
+<pre class = 'prettyprint lang-r'>library(nycflights13)
+data(flights)
+head(flights)</pre>
+
+<pre >## # A tibble: 6 x 19
+##    year month   day dep_time sched_dep_time dep_delay arr_time
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+## 1  2013     1     1      517            515         2      830
+## 2  2013     1     1      533            529         4      850
+## 3  2013     1     1      542            540         2      923
+## 4  2013     1     1      544            545        -1     1004
+## 5  2013     1     1      554            600        -6      812
+## 6  2013     1     1      554            558        -4      740
+## # … with 12 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
+## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
+## #   time_hour &lt;dttm&gt;</pre>
+
+<pre class = 'prettyprint lang-r'># View(head(flights))</pre>
+
+</article></slide><slide class=""><hgroup><h2>nycflights13: Flights that Departed NYC in 2013</h2></hgroup><article  id="nycflights13-flights-that-departed-nyc-in-2013-1">
+
+<ul>
+<li><code>?flights</code>可以看到個別欄位的說明</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>航空公司的全名</h2></hgroup><article  id="section-31">
+
+<pre class = 'prettyprint lang-r'>data(airlines)
+head(airlines)</pre>
+
+<pre >## # A tibble: 6 x 2
+##   carrier name                    
+##   &lt;chr&gt;   &lt;chr&gt;                   
+## 1 9E      Endeavor Air Inc.       
+## 2 AA      American Airlines Inc.  
+## 3 AS      Alaska Airlines Inc.    
+## 4 B6      JetBlue Airways         
+## 5 DL      Delta Air Lines Inc.    
+## 6 EV      ExpressJet Airlines Inc.</pre>
+
+<pre class = 'prettyprint lang-r'># View(airlines)</pre>
+
+</article></slide><slide class=""><hgroup><h2>第一筆資料的航空公司全名</h2></hgroup><article  id="section-32">
+
+<pre class = 'prettyprint lang-r'>flights$carrier[1]</pre>
+
+<pre >## [1] &quot;UA&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>filter(airlines, carrier == flights$carrier[1])</pre>
+
+<pre >## # A tibble: 1 x 2
+##   carrier name                 
+##   &lt;chr&gt;   &lt;chr&gt;                
+## 1 UA      United Air Lines Inc.</pre>
+
+</article></slide><slide class=""><hgroup><h2>第三筆資料的航空公司全名</h2></hgroup><article  id="section-33">
+
+<pre class = 'prettyprint lang-r'>flights$carrier[3]</pre>
+
+<pre >## [1] &quot;AA&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>filter(airlines, carrier == flights$carrier[3])</pre>
+
+<pre >## # A tibble: 1 x 2
+##   carrier name                  
+##   &lt;chr&gt;   &lt;chr&gt;                 
+## 1 AA      American Airlines Inc.</pre>
+
+</article></slide><slide class=""><hgroup><h2>所有資料的航空公司全名</h2></hgroup><article  id="section-34">
+
+<ul>
+<li>對<code>flights</code>建立變數<code>name</code>代表該筆資料的航空公司名稱</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>.i &lt;- match(flights$carrier, airlines$carrier)
+stopifnot(flights$carrier == airlines$carrier[.i])
+flights2 &lt;- flights
+flights2$name &lt;- airlines$name[.i]</pre>
+
+</article></slide><slide class=""><hgroup><h2>比對</h2></hgroup><article  id="section-35">
+
+<p><img src='img/flightsVSairlines.png' style='50'></img></p>
+
+</article></slide><slide class=""><hgroup><h2>Key: <code>carrier</code></h2></hgroup><article  id="key-carrier">
+
+<ul>
+<li>根據<code>carrier</code>的值，比對<code>flights</code>的資料與<code>airlines</code>的資料</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-36">
+
+<ul>
+<li>請問各航空公司的起飛時間的平均延遲是？</li>
+<li>請問各航空公司的到達時間的平均延遲是？</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-37">
+
+<ul>
+<li>直接作</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>group_by(flights2, name) %&gt;%
+  summarise(mean(dep_delay))</pre>
+
+<pre >## # A tibble: 16 x 2
+##    name                        `mean(dep_delay)`
+##    &lt;chr&gt;                                   &lt;dbl&gt;
+##  1 AirTran Airways Corporation             NA   
+##  2 Alaska Airlines Inc.                    NA   
+##  3 American Airlines Inc.                  NA   
+##  4 Delta Air Lines Inc.                    NA   
+##  5 Endeavor Air Inc.                       NA   
+##  6 Envoy Air                               NA   
+##  7 ExpressJet Airlines Inc.                NA   
+##  8 Frontier Airlines Inc.                  NA   
+##  9 Hawaiian Airlines Inc.                   4.90
+## 10 JetBlue Airways                         NA   
+## 11 Mesa Airlines Inc.                      NA   
+## 12 SkyWest Airlines Inc.                   NA   
+## 13 Southwest Airlines Co.                  NA   
+## 14 United Air Lines Inc.                   NA   
+## 15 US Airways Inc.                         NA   
+## 16 Virgin America                          NA</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-38">
+
+<ul>
+<li>處理<code>NA</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>mean(is.na(flights2$dep_delay))</pre>
+
+<pre >## [1] 0.02451184</pre>
+
+<pre class = 'prettyprint lang-r'>group_by(flights2, name) %&gt;% 
+  summarise(mean(is.na(dep_delay)))</pre>
+
+<pre >## # A tibble: 16 x 2
+##    name                        `mean(is.na(dep_delay))`
+##    &lt;chr&gt;                                          &lt;dbl&gt;
+##  1 AirTran Airways Corporation                  0.0224 
+##  2 Alaska Airlines Inc.                         0.00280
+##  3 American Airlines Inc.                       0.0194 
+##  4 Delta Air Lines Inc.                         0.00725
+##  5 Endeavor Air Inc.                            0.0566 
+##  6 Envoy Air                                    0.0467 
+##  7 ExpressJet Airlines Inc.                     0.0520 
+##  8 Frontier Airlines Inc.                       0.00438
+##  9 Hawaiian Airlines Inc.                       0      
+## 10 JetBlue Airways                              0.00853
+## 11 Mesa Airlines Inc.                           0.0932 
+## 12 SkyWest Airlines Inc.                        0.0938 
+## 13 Southwest Airlines Co.                       0.0156 
+## 14 United Air Lines Inc.                        0.0117 
+## 15 US Airways Inc.                              0.0323 
+## 16 Virgin America                               0.00601</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-39">
+
+<ul>
+<li>移除<code>NA</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>group_by(flights2, name) %&gt;% 
+  summarise(mean(dep_delay, na.rm = TRUE))</pre>
+
+<pre >## # A tibble: 16 x 2
+##    name                        `mean(dep_delay, na.rm = TRUE)`
+##    &lt;chr&gt;                                                 &lt;dbl&gt;
+##  1 AirTran Airways Corporation                           18.7 
+##  2 Alaska Airlines Inc.                                   5.80
+##  3 American Airlines Inc.                                 8.59
+##  4 Delta Air Lines Inc.                                   9.26
+##  5 Endeavor Air Inc.                                     16.7 
+##  6 Envoy Air                                             10.6 
+##  7 ExpressJet Airlines Inc.                              20.0 
+##  8 Frontier Airlines Inc.                                20.2 
+##  9 Hawaiian Airlines Inc.                                 4.90
+## 10 JetBlue Airways                                       13.0 
+## 11 Mesa Airlines Inc.                                    19.0 
+## 12 SkyWest Airlines Inc.                                 12.6 
+## 13 Southwest Airlines Co.                                17.7 
+## 14 United Air Lines Inc.                                 12.1 
+## 15 US Airways Inc.                                        3.78
+## 16 Virgin America                                        12.9</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>dplyr::left_join</code></h2></hgroup><article  id="dplyrleft_join">
+
+<pre class = 'prettyprint lang-r'>data(flights)
+left_join(flights, airlines, by = &quot;carrier&quot;)</pre>
+
+<pre >## # A tibble: 336,776 x 20
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515         2      830
+##  2  2013     1     1      533            529         4      850
+##  3  2013     1     1      542            540         2      923
+##  4  2013     1     1      544            545        -1     1004
+##  5  2013     1     1      554            600        -6      812
+##  6  2013     1     1      554            558        -4      740
+##  7  2013     1     1      555            600        -5      913
+##  8  2013     1     1      557            600        -3      709
+##  9  2013     1     1      557            600        -3      838
+## 10  2013     1     1      558            600        -2      753
+## # … with 336,766 more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;, name &lt;chr&gt;</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>dplyr::left_join</code></h2></hgroup><article  id="dplyrleft_join-1">
+
+<pre class = 'prettyprint lang-r'>data(flights)
+left_join(flights, airlines)</pre>
+
+<pre >## Joining, by = &quot;carrier&quot;</pre>
+
+<pre >## # A tibble: 336,776 x 20
+##     year month   day dep_time sched_dep_time dep_delay arr_time
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+##  1  2013     1     1      517            515         2      830
+##  2  2013     1     1      533            529         4      850
+##  3  2013     1     1      542            540         2      923
+##  4  2013     1     1      544            545        -1     1004
+##  5  2013     1     1      554            600        -6      812
+##  6  2013     1     1      554            558        -4      740
+##  7  2013     1     1      555            600        -5      913
+##  8  2013     1     1      557            600        -3      709
+##  9  2013     1     1      557            600        -3      838
+## 10  2013     1     1      558            600        -2      753
+## # … with 336,766 more rows, and 13 more variables: sched_arr_time &lt;int&gt;,
+## #   arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;, name &lt;chr&gt;</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>dplyr::left_join</code>的參數</h2></hgroup><article  id="dplyrleft_join-2">
+
+<pre class = 'prettyprint lang-r'>args(dplyr::left_join)</pre>
+
+<pre >## function (x, y, by = NULL, copy = FALSE, suffix = c(&quot;.x&quot;, &quot;.y&quot;), 
+##     ...) 
+## NULL</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>dplyr::left_join</code>: <code>by</code>參數</h2></hgroup><article  id="dplyrleft_join-by">
+
+<p><img src='img/flightsVSairlines.png' style='50'></img></p>
+
+</article></slide><slide class=""><hgroup><h2>Key的重要性</h2></hgroup><article  id="key">
+
+<ul>
+<li>整合結構化資料時，最重要的就是要先找到（產生）共同的Key</li>
+<li>我個人實務上最常用的是<code>left_join</code>
+
+<ul>
+<li>資訊的黏貼</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2><code>y</code>上不唯一的Key</h2></hgroup><article  id="ykey">
+
+<pre class = 'prettyprint lang-r'>head(flights) %&gt;%
+  left_join(airlines) %&gt;%
+  select(carrier, name)</pre>
+
+<pre >## Joining, by = &quot;carrier&quot;</pre>
+
+<pre >## # A tibble: 6 x 2
+##   carrier name                  
+##   &lt;chr&gt;   &lt;chr&gt;                 
+## 1 UA      United Air Lines Inc. 
+## 2 UA      United Air Lines Inc. 
+## 3 AA      American Airlines Inc.
+## 4 B6      JetBlue Airways       
+## 5 DL      Delta Air Lines Inc.  
+## 6 UA      United Air Lines Inc.</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>y</code>上不唯一的Key</h2></hgroup><article  id="ykey-1">
+
+<pre class = 'prettyprint lang-r'>head(flights) %&gt;%
+  left_join(rbind(airlines, data.frame(carrier = &quot;UA&quot;, name = &quot;duplicated&quot;))) %&gt;%
+  select(carrier, name)</pre>
+
+<pre >## Joining, by = &quot;carrier&quot;</pre>
+
+<pre >## # A tibble: 9 x 2
+##   carrier name                  
+##   &lt;chr&gt;   &lt;chr&gt;                 
+## 1 UA      United Air Lines Inc. 
+## 2 UA      duplicated            
+## 3 UA      United Air Lines Inc. 
+## 4 UA      duplicated            
+## 5 AA      American Airlines Inc.
+## 6 B6      JetBlue Airways       
+## 7 DL      Delta Air Lines Inc.  
+## 8 UA      United Air Lines Inc. 
+## 9 UA      duplicated</pre>
+
+</article></slide><slide class=""><hgroup><h2>機場的天氣</h2></hgroup><article  id="section-40">
+
+<pre class = 'prettyprint lang-r'>data(weather)
+head(weather)</pre>
+
+<pre >## # A tibble: 6 x 15
+##   origin  year month   day  hour  temp  dewp humid wind_dir wind_speed
+##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+## 1 EWR     2013     1     1     1  39.0  26.1  59.4      270      10.4 
+## 2 EWR     2013     1     1     2  39.0  27.0  61.6      250       8.06
+## 3 EWR     2013     1     1     3  39.0  28.0  64.4      240      11.5 
+## 4 EWR     2013     1     1     4  39.9  28.0  62.2      250      12.7 
+## 5 EWR     2013     1     1     5  39.0  28.0  64.4      260      12.7 
+## 6 EWR     2013     1     1     6  37.9  28.0  67.2      240      11.5 
+## # … with 5 more variables: wind_gust &lt;dbl&gt;, precip &lt;dbl&gt;, pressure &lt;dbl&gt;,
+## #   visib &lt;dbl&gt;, time_hour &lt;dttm&gt;</pre>
+
+<pre class = 'prettyprint lang-r'># View(weather)
+# ?weather</pre>
+
+</article></slide><slide class=""><hgroup><h2>直接<code>left_join</code></h2></hgroup><article  id="left_join">
+
+<pre class = 'prettyprint lang-r'>left_join(flights, weather) %&gt;%
+  head()</pre>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<pre >## # A tibble: 6 x 28
+##    year month   day dep_time sched_dep_time dep_delay arr_time
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+## 1  2013     1     1      517            515         2      830
+## 2  2013     1     1      533            529         4      850
+## 3  2013     1     1      542            540         2      923
+## 4  2013     1     1      544            545        -1     1004
+## 5  2013     1     1      554            600        -6      812
+## 6  2013     1     1      554            558        -4      740
+## # … with 21 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
+## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
+## #   time_hour &lt;dttm&gt;, temp &lt;dbl&gt;, dewp &lt;dbl&gt;, humid &lt;dbl&gt;, wind_dir &lt;dbl&gt;,
+## #   wind_speed &lt;dbl&gt;, wind_gust &lt;dbl&gt;, precip &lt;dbl&gt;, pressure &lt;dbl&gt;,
+## #   visib &lt;dbl&gt;</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>airports</code></h2></hgroup><article  id="airports">
+
+<pre class = 'prettyprint lang-r'>data(airports)
+head(airports)</pre>
+
+<pre >## # A tibble: 6 x 8
+##   faa   name                       lat   lon   alt    tz dst   tzone       
+##   &lt;chr&gt; &lt;chr&gt;                    &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;       
+## 1 04G   Lansdowne Airport         41.1 -80.6  1044    -5 A     America/New…
+## 2 06A   Moton Field Municipal A…  32.5 -85.7   264    -6 A     America/Chi…
+## 3 06C   Schaumburg Regional       42.0 -88.1   801    -6 A     America/Chi…
+## 4 06N   Randall Airport           41.4 -74.4   523    -5 A     America/New…
+## 5 09J   Jekyll Island Airport     31.1 -81.4    11    -5 A     America/New…
+## 6 0A9   Elizabethton Municipal …  36.4 -82.2  1593    -5 A     America/New…</pre>
+
+<pre class = 'prettyprint lang-r'># View(airports)
+# ?airports</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>airports</code></h2></hgroup><article  id="airports-1">
+
+<pre class = 'prettyprint lang-r'>left_join(flights, airports, by = c(&quot;origin&quot; = &quot;faa&quot;)) %&gt;%
+  head()</pre>
+
+<pre >## # A tibble: 6 x 26
+##    year month   day dep_time sched_dep_time dep_delay arr_time
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;
+## 1  2013     1     1      517            515         2      830
+## 2  2013     1     1      533            529         4      850
+## 3  2013     1     1      542            540         2      923
+## 4  2013     1     1      544            545        -1     1004
+## 5  2013     1     1      554            600        -6      812
+## 6  2013     1     1      554            558        -4      740
+## # … with 19 more variables: sched_arr_time &lt;int&gt;, arr_delay &lt;dbl&gt;,
+## #   carrier &lt;chr&gt;, flight &lt;int&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+## #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;,
+## #   time_hour &lt;dttm&gt;, name &lt;chr&gt;, lat &lt;dbl&gt;, lon &lt;dbl&gt;, alt &lt;int&gt;,
+## #   tz &lt;dbl&gt;, dst &lt;chr&gt;, tzone &lt;chr&gt;</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>airports</code></h2></hgroup><article  id="airports-2">
+
+<ul>
+<li>同時整合起點與終點</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>left_join(flights, airports, by = c(&quot;origin&quot; = &quot;faa&quot;)) %&gt;%
+  left_join(airports, by = c(&quot;dest&quot; = &quot;faa&quot;)) %&gt;%
+  colnames()</pre>
+
+<pre >##  [1] &quot;year&quot;           &quot;month&quot;          &quot;day&quot;            &quot;dep_time&quot;      
+##  [5] &quot;sched_dep_time&quot; &quot;dep_delay&quot;      &quot;arr_time&quot;       &quot;sched_arr_time&quot;
+##  [9] &quot;arr_delay&quot;      &quot;carrier&quot;        &quot;flight&quot;         &quot;tailnum&quot;       
+## [13] &quot;origin&quot;         &quot;dest&quot;           &quot;air_time&quot;       &quot;distance&quot;      
+## [17] &quot;hour&quot;           &quot;minute&quot;         &quot;time_hour&quot;      &quot;name.x&quot;        
+## [21] &quot;lat.x&quot;          &quot;lon.x&quot;          &quot;alt.x&quot;          &quot;tz.x&quot;          
+## [25] &quot;dst.x&quot;          &quot;tzone.x&quot;        &quot;name.y&quot;         &quot;lat.y&quot;         
+## [29] &quot;lon.y&quot;          &quot;alt.y&quot;          &quot;tz.y&quot;           &quot;dst.y&quot;         
+## [33] &quot;tzone.y&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>airports</code></h2></hgroup><article  id="airports-3">
+
+<ul>
+<li><code>suffix</code>參數</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>left_join(flights, airports, by = c(&quot;origin&quot; = &quot;faa&quot;)) %&gt;%
+  left_join(airports, by = c(&quot;dest&quot; = &quot;faa&quot;), suffix = c(&quot;.origin&quot;, &quot;.dest&quot;)) %&gt;%
+  colnames()</pre>
+
+<pre >##  [1] &quot;year&quot;           &quot;month&quot;          &quot;day&quot;            &quot;dep_time&quot;      
+##  [5] &quot;sched_dep_time&quot; &quot;dep_delay&quot;      &quot;arr_time&quot;       &quot;sched_arr_time&quot;
+##  [9] &quot;arr_delay&quot;      &quot;carrier&quot;        &quot;flight&quot;         &quot;tailnum&quot;       
+## [13] &quot;origin&quot;         &quot;dest&quot;           &quot;air_time&quot;       &quot;distance&quot;      
+## [17] &quot;hour&quot;           &quot;minute&quot;         &quot;time_hour&quot;      &quot;name.origin&quot;   
+## [21] &quot;lat.origin&quot;     &quot;lon.origin&quot;     &quot;alt.origin&quot;     &quot;tz.origin&quot;     
+## [25] &quot;dst.origin&quot;     &quot;tzone.origin&quot;   &quot;name.dest&quot;      &quot;lat.dest&quot;      
+## [29] &quot;lon.dest&quot;       &quot;alt.dest&quot;       &quot;tz.dest&quot;        &quot;dst.dest&quot;      
+## [33] &quot;tzone.dest&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-41">
+
+<ul>
+<li>起飛機場的風速對抵達時間的延遲是不是有影響?</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-42">
+
+<ul>
+<li>先看看風速與的抵達時間延遲的關係</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay)</pre>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<pre >## # A tibble: 336,776 x 2
+##    wind_speed arr_delay
+##         &lt;dbl&gt;     &lt;dbl&gt;
+##  1       12.7        11
+##  2       15.0        20
+##  3       15.0        33
+##  4       15.0       -18
+##  5       16.1       -25
+##  6       12.7        12
+##  7       11.5        19
+##  8       16.1       -14
+##  9       13.8        -8
+## 10       16.1         8
+## # … with 336,766 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-43">
+
+<ul>
+<li>為什麼有<code>NA</code>? 是不是因為：有<code>weather</code>資料的地點不多？</li>
+</ul>
+
+<h3>問資料</h3>
+
+<pre class = 'prettyprint lang-r'>table(flights$origin)</pre>
+
+<pre >## 
+##    EWR    JFK    LGA 
+## 120835 111279 104662</pre>
+
+<pre class = 'prettyprint lang-r'>table(weather$origin)</pre>
+
+<pre >## 
+##  EWR  JFK  LGA 
+## 8703 8706 8706</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-45">
+
+<ul>
+<li>是不是有<code>time_hour</code>欄位才導致<code>NA</code>？</li>
+</ul>
+
+<h3>問資料</h3>
+
+<pre class = 'prettyprint lang-r'>select(flights, -time_hour) %&gt;%
+  left_join(weather) %&gt;%
+  select(wind_speed, arr_delay)</pre>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;)</pre>
+
+<pre >## # A tibble: 336,776 x 2
+##    wind_speed arr_delay
+##         &lt;dbl&gt;     &lt;dbl&gt;
+##  1       12.7        11
+##  2       15.0        20
+##  3       15.0        33
+##  4       15.0       -18
+##  5       16.1       -25
+##  6       12.7        12
+##  7       11.5        19
+##  8       16.1       -14
+##  9       13.8        -8
+## 10       16.1         8
+## # … with 336,766 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-47">
+
+<ul>
+<li>是不是比對失敗導致<code>NA</code>?</li>
+</ul>
+
+<h3>問資料</h3>
+
+<pre class = 'prettyprint lang-r'>select(flights, year, month, day, origin, hour, time_hour) %&gt;%
+  slice(1)</pre>
+
+<pre >## # A tibble: 1 x 6
+##    year month   day origin  hour time_hour          
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;dttm&gt;             
+## 1  2013     1     1 EWR        5 2013-01-01 05:00:00</pre>
+
+<pre class = 'prettyprint lang-r'>filter(weather, year == 2013, month == 1, day == 1, origin == &quot;EWR&quot;, hour == 5., time_hour == flights$time_hour[1])</pre>
+
+<pre >## # A tibble: 1 x 15
+##   origin  year month   day  hour  temp  dewp humid wind_dir wind_speed
+##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+## 1 EWR     2013     1     1     5  39.0  28.0  64.4      260       12.7
+## # … with 5 more variables: wind_gust &lt;dbl&gt;, precip &lt;dbl&gt;, pressure &lt;dbl&gt;,
+## #   visib &lt;dbl&gt;, time_hour &lt;dttm&gt;</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-49">
+
+<ul>
+<li><code>weather</code>有漏失資料嘛？</li>
+</ul>
+
+<h3>問資料</h3>
+
+<pre class = 'prettyprint lang-r'>filter(weather, year == 2013, month == 1, day == 1, origin == &quot;EWR&quot;) %&gt;%
+  arrange(hour) %&gt;%
+  select(hour)</pre>
+
+<pre >## # A tibble: 22 x 1
+##     hour
+##    &lt;int&gt;
+##  1     1
+##  2     2
+##  3     3
+##  4     4
+##  5     5
+##  6     6
+##  7     7
+##  8     8
+##  9     9
+## 10    10
+## # … with 12 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-51">
+
+<ul>
+<li>假設掉資料的現象並沒有特別的模式 –&gt; 拿掉<code>NA</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay) %&gt;%
+  filter(!is.na(wind_speed), !is.na(arr_delay))</pre>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<pre >## # A tibble: 325,741 x 2
+##    wind_speed arr_delay
+##         &lt;dbl&gt;     &lt;dbl&gt;
+##  1       12.7        11
+##  2       15.0        20
+##  3       15.0        33
+##  4       15.0       -18
+##  5       16.1       -25
+##  6       12.7        12
+##  7       11.5        19
+##  8       16.1       -14
+##  9       13.8        -8
+## 10       16.1         8
+## # … with 325,731 more rows</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-52">
+
+<ul>
+<li>畫圖</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay) %&gt;%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %&gt;%
+  ggplot(aes(x = wind_speed, y = arr_delay)) +
+  geom_point()</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-53">
+
+<ul>
+<li>畫圖</li>
+</ul>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<p><img src="Structured-Data_files/figure-html/unnamed-chunk-106-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-54">
+
+<ul>
+<li>那些<code>wind_speed</code>破千的是什麼意思？</li>
+<li>查詢<code>mph</code>的合理範圍： <a href='https://en.wikipedia.org/wiki/Beaufort_scale' title=''>https://en.wikipedia.org/wiki/Beaufort_scale</a></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>range(weather$wind_speed, na.rm = TRUE)</pre>
+
+<pre >## [1]    0.000 1048.361</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-55">
+
+<ul>
+<li>拿掉 <code>wind_speed</code> 超過 1000 的資料後檢查<code>range</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>filter(weather, wind_speed &lt; 1000) %&gt;% 
+  do(data.frame(range = range(.$wind_speed)))</pre>
+
+<pre >##      range
+## 1  0.00000
+## 2 42.57886</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-56">
+
+<ul>
+<li>重新畫圖</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay) %&gt;%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %&gt;%
+  filter(wind_speed &lt; 1000) %&gt;%
+  ggplot(aes(x = wind_speed, y = arr_delay)) +
+  geom_point()</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-57">
+
+<ul>
+<li>重新畫圖</li>
+</ul>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<p><img src="Structured-Data_files/figure-html/unnamed-chunk-110-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-58">
+
+<ul>
+<li>分組後取平均</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>.df &lt;- left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay) %&gt;%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %&gt;%
+  filter(wind_speed &lt; 1000)
+.cut &lt;- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group &lt;- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+ggplot(.df, aes(x = wind_speed_group, y = arr_delay)) +
+  geom_boxplot()</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-59">
+
+<ul>
+<li>分組後取平均</li>
+</ul>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<p><img src="Structured-Data_files/figure-html/unnamed-chunk-112-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-60">
+
+<ul>
+<li>分組後的分佈圖</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>.df &lt;- left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay) %&gt;%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %&gt;%
+  filter(wind_speed &lt; 1000)
+.cut &lt;- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group &lt;- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+ggplot(.df, aes(x = wind_speed_group, y = arr_delay)) +
+  geom_boxplot()</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-61">
+
+<ul>
+<li>分組後的分佈圖</li>
+</ul>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<p><img src="Structured-Data_files/figure-html/unnamed-chunk-114-1.png" width="720" /></p>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-62">
+
+<ul>
+<li>直接取平均</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>.df &lt;- left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay) %&gt;%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %&gt;%
+  filter(wind_speed &lt; 1000)
+.cut &lt;- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group &lt;- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+group_by(.df, wind_speed_group) %&gt;%
+  summarise(mean(arr_delay))</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-63">
+
+<ul>
+<li>直接取平均</li>
+</ul>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<pre >## # A tibble: 10 x 2
+##    wind_speed_group `mean(arr_delay)`
+##    &lt;fct&gt;                        &lt;dbl&gt;
+##  1 [0,4.6]                       3.52
+##  2 (4.6,6.9]                     3.79
+##  3 (6.9,8.06]                    6.23
+##  4 (8.06,9.21]                   5.70
+##  5 (9.21,10.4]                   6.17
+##  6 (10.4,11.5]                   5.81
+##  7 (11.5,13.8]                   8.35
+##  8 (13.8,15]                     8.22
+##  9 (15,18.4]                    10.4 
+## 10 (18.4,42.6]                  13.1</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-64">
+
+<ul>
+<li>去除邊界<code>10%</code>的資料後取平均</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>.df &lt;- left_join(flights, weather) %&gt;%
+  select(wind_speed, arr_delay) %&gt;%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %&gt;%
+  filter(wind_speed &lt; 1000)
+.cut &lt;- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group &lt;- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+group_by(.df, wind_speed_group) %&gt;%
+  summarise(mean(arr_delay, trim = 0.05))</pre>
+
+</article></slide><slide class=""><hgroup><h2>小練習</h2></hgroup><article  id="section-65">
+
+<ul>
+<li>去除邊界<code>10%</code>的資料後取平均</li>
+</ul>
+
+<pre >## Joining, by = c(&quot;year&quot;, &quot;month&quot;, &quot;day&quot;, &quot;origin&quot;, &quot;hour&quot;, &quot;time_hour&quot;)</pre>
+
+<pre >## # A tibble: 10 x 2
+##    wind_speed_group `mean(arr_delay, trim = 0.05)`
+##    &lt;fct&gt;                                     &lt;dbl&gt;
+##  1 [0,4.6]                                  -1.90 
+##  2 (4.6,6.9]                                -1.28 
+##  3 (6.9,8.06]                                0.728
+##  4 (8.06,9.21]                               0.204
+##  5 (9.21,10.4]                               0.514
+##  6 (10.4,11.5]                               0.414
+##  7 (11.5,13.8]                               2.55 
+##  8 (13.8,15]                                 2.40 
+##  9 (15,18.4]                                 4.34 
+## 10 (18.4,42.6]                               7.37</pre>
+
+</article></slide><slide class=""><hgroup><h2>這些設定沒有標準答案</h2></hgroup><article  id="section-66">
+
+<ul>
+<li>一定要用<code>quantile</code>切割資料嘛？
+
+<ul>
+<li>一定要十組嘛？</li>
+</ul></li>
+<li>高手會調這些參數調到支持他們的論點</li>
+<li>新手會亂改數據造假</li>
+</ul>
+
+<p><img src='img/asset.jpg' style='max-width: 50%; max-height: 50%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>其他的<code>join</code>函數</h2></hgroup><article  id="join">
+
+<pre class = 'prettyprint lang-r'>?left_join</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>left_join</code></h2></hgroup><article  id="left_join-1">
+
+<p><img src="http://i.imgur.com/K8EKfm4.png"/></p>
+
+</article></slide><slide class=""><hgroup><h2><code>left_join</code></h2></hgroup><article  id="left_join-2">
+
+<ul>
+<li>兩個範例資料</li>
+</ul>
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>band_members</pre>
+
+<pre >## # A tibble: 3 x 2
+##   name  band   
+##   &lt;chr&gt; &lt;chr&gt;  
+## 1 Mick  Stones 
+## 2 John  Beatles
+## 3 Paul  Beatles</pre>
+
+<pre class = 'prettyprint lang-r'>band_instruments</pre>
+
+<pre >## # A tibble: 3 x 2
+##   name  plays 
+##   &lt;chr&gt; &lt;chr&gt; 
+## 1 John  guitar
+## 2 Paul  bass  
+## 3 Keith guitar</pre></div>
+
+</article></slide><slide class=""><hgroup><h2><code>left_join</code></h2></hgroup><article  id="left_join-3">
+
+<pre class = 'prettyprint lang-r'>left_join(band_members, band_instruments)</pre>
+
+<pre >## Joining, by = &quot;name&quot;</pre>
+
+<pre >## # A tibble: 3 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 Mick  Stones  &lt;NA&gt;  
+## 2 John  Beatles guitar
+## 3 Paul  Beatles bass</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>right_join</code></h2></hgroup><article  id="right_join">
+
+<p><img src="https://i.imgur.com/ttI9e0s.png"/></p>
+
+</article></slide><slide class=""><hgroup><h2><code>right_join</code></h2></hgroup><article  id="right_join-1">
+
+<pre class = 'prettyprint lang-r'>right_join(band_members, band_instruments)</pre>
+
+<pre >## Joining, by = &quot;name&quot;</pre>
+
+<pre >## # A tibble: 3 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 John  Beatles guitar
+## 2 Paul  Beatles bass  
+## 3 Keith &lt;NA&gt;    guitar</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>inner_join</code></h2></hgroup><article  id="inner_join">
+
+<p><img src="https://i.imgur.com/4d64EXX.png"/></p>
+
+<pre class = 'prettyprint lang-r'>inner_join(band_members, band_instruments)</pre>
+
+<pre >## Joining, by = &quot;name&quot;</pre>
+
+<pre >## # A tibble: 2 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 John  Beatles guitar
+## 2 Paul  Beatles bass</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>full_join</code></h2></hgroup><article  id="full_join">
+
+<p><img src="https://i.imgur.com/IHm04sD.png"/></p>
+
+</article></slide><slide class=""><hgroup><h2><code>full_join</code></h2></hgroup><article  id="full_join-1">
+
+<pre class = 'prettyprint lang-r'>full_join(band_members, band_instruments)</pre>
+
+<pre >## Joining, by = &quot;name&quot;</pre>
+
+<pre >## # A tibble: 4 x 3
+##   name  band    plays 
+##   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; 
+## 1 Mick  Stones  &lt;NA&gt;  
+## 2 John  Beatles guitar
+## 3 Paul  Beatles bass  
+## 4 Keith &lt;NA&gt;    guitar</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>anti_join</code></h2></hgroup><article  id="anti_join">
+
+<p><img src="https://i.imgur.com/QxcF0Fk.png"/></p>
+
+</article></slide><slide class=""><hgroup><h2><code>anti_join</code></h2></hgroup><article  id="anti_join-1">
+
+<pre class = 'prettyprint lang-r'>anti_join(band_members, band_instruments)</pre>
+
+<pre >## Joining, by = &quot;name&quot;</pre>
+
+<pre >## # A tibble: 1 x 2
+##   name  band  
+##   &lt;chr&gt; &lt;chr&gt; 
+## 1 Mick  Stones</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>semi_join</code></h2></hgroup><article  id="semi_join">
+
+<p><img src="http://i.imgur.com/M2UF1mM.png"/></p>
+
+</article></slide><slide class=""><hgroup><h2><code>semi_join</code></h2></hgroup><article  id="semi_join-1">
+
+<pre class = 'prettyprint lang-r'>semi_join(band_members, band_instruments)</pre>
+
+<pre >## Joining, by = &quot;name&quot;</pre>
+
+<pre >## # A tibble: 2 x 2
+##   name  band   
+##   &lt;chr&gt; &lt;chr&gt;  
+## 1 John  Beatles
+## 2 Paul  Beatles</pre>
+
+<ul>
+<li>當<code>y</code>的Key有重複時，<code>inner_join</code>會重複， <code>semi_join</code>不會</li>
+</ul>
+
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>時間資料的處理</h2></hgroup><article  id="section-67">
+
+</article></slide><slide class=""><hgroup><h2>Open Data上最常見於整合用的Key</h2></hgroup><article  id="open-datakey">
+
+<ul>
+<li>時間</li>
+<li>空間</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>時間整合的挑戰</h2></hgroup><article  id="section-68">
+
+<ul>
+<li>時間格式不同</li>
+<li>時間頻率不同</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>時間的格式: <code>format</code></h2></hgroup><article  id="format">
+
+<pre class = 'prettyprint lang-r'>Sys.time()</pre>
+
+<pre >## [1] &quot;2019-05-11 02:55:35 CST&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>format(Sys.time())</pre>
+
+<pre >## [1] &quot;2019-05-11 02:55:35&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>format(Sys.time(), &quot;%Y-%m-%d %H:%M:%S&quot;)</pre>
+
+<pre >## [1] &quot;2019-05-11 02:55:35&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>format(Sys.time(), &quot;%Y%m%d%H%M%S&quot;)</pre>
+
+<pre >## [1] &quot;20190511025535&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>時間的格式: <code>format</code></h2></hgroup><article  id="format-1">
+
+<pre class = 'prettyprint lang-r'>?format.POSIXct</pre>
+
+<ul>
+<li>Details 中有如<code>%a</code>的格式說明</li>
+<li>我常用的
+
+<ul>
+<li><code>&quot;%Y-%m-%d %H:%M:%S&quot;</code> 年-月-日 小時-分鐘-秒數，並且固定數字的位數</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>時間的格式: 實務上請愛用 <a href='https://en.wikipedia.org/wiki/ISO_8601' title=''>ISO 8601</a></h2></hgroup><article  id="iso-8601">
+
+<ul>
+<li><code>&quot;%Y-%m-%dT%H:%M:%SZ&quot;</code></li>
+</ul>
+
+<p><img src='img/what-is-your-idea-of-a-perfectdd-mm-yyyy-other-formats-date-36636391.png' style='max-width: 80%; max-height: 80%; '></img></p>
+
+</article></slide><slide class=""><hgroup><h2>R中的時間相關物件：<code>POSIXct</code>與<code>POSIXlt</code></h2></hgroup><article  id="rposixctposixlt">
+
+<pre class = 'prettyprint lang-r'>Sys.time()</pre>
+
+<pre >## [1] &quot;2019-05-11 02:55:35 CST&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>class(Sys.time())</pre>
+
+<pre >## [1] &quot;POSIXct&quot; &quot;POSIXt&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>strptime(&quot;2018-01-01 08:00:00&quot;, &quot;%Y-%m-%d %H:%M:%S&quot;)</pre>
+
+<pre >## [1] &quot;2018-01-01 08:00:00 CST&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>strptime(&quot;2018-01-01 08:00:00&quot;, &quot;%Y-%m-%d %H:%M:%S&quot;) %&gt;% class()</pre>
+
+<pre >## [1] &quot;POSIXlt&quot; &quot;POSIXt&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>strptime(&quot;2018-01-01 08:00:00&quot;, &quot;%Y-%m-%d %H:%M:%S&quot;) %&gt;%
+  as.POSIXct()</pre>
+
+<pre >## [1] &quot;2018-01-01 08:00:00 CST&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>POSIXct</code>的本質</h2></hgroup><article  id="posixct">
+
+<ul>
+<li>從某個時間點（預設是格林威治時間<code>1970-01-01 00:00:00</code>）開始到指定時間為止的秒數</li>
+<li>numeric vector</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>unclass(Sys.time())</pre>
+
+<pre >## [1] 1557514536</pre>
+
+</article></slide><slide class=""><hgroup><h2><code>POSIXlt</code>的本質</h2></hgroup><article  id="posixlt">
+
+<ul>
+<li>分別紀錄年月日… 等資訊</li>
+<li>list</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>unclass(strptime(&quot;2018-01-01 08:00:00&quot;, &quot;%Y-%m-%d %H:%M:%S&quot;))</pre>
+
+<pre >## $sec
+## [1] 0
+## 
+## $min
+## [1] 0
+## 
+## $hour
+## [1] 8
+## 
+## $mday
+## [1] 1
+## 
+## $mon
+## [1] 0
+## 
+## $year
+## [1] 118
+## 
+## $wday
+## [1] 1
+## 
+## $yday
+## [1] 0
+## 
+## $isdst
+## [1] 0
+## 
+## $zone
+## [1] &quot;CST&quot;
+## 
+## $gmtoff
+## [1] NA</pre>
+
+</article></slide><slide class=""><hgroup><h2>個人比較常用<code>POSIXct</code></h2></hgroup><article  id="posixct-1">
+
+<ul>
+<li>dplyr有支援<code>&lt;dttm&gt;</code></li>
+<li>可以使用<code>as.POSIXct</code></li>
+<li>從某個時間點（預設是格林威治時間<code>1970-01-01 00:00:00</code>）開始到指定時間為止的秒數</li>
+<li>與文字作轉換時要考慮時差、時區</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>.t &lt;- 0
+class(.t) &lt;- class(Sys.time())
+.t # Our timezone is +8</pre>
+
+<pre >## [1] &quot;1970-01-01 08:00:00 CST&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>時區</h2></hgroup><article  id="section-69">
+
+<ul>
+<li>我們要怎麼處理以下的時間：
+
+<ul>
+<li>台北時間 <code>2018-01-01 08:00:00</code></li>
+<li>格林威治時間 <code>2018-01-01 00:00:00</code></li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>as.POSIXct(&quot;2018-01-01 08:00:00&quot;, tz = &quot;Asia/Taipei&quot;) %&gt;% unclass()</pre>
+
+<pre >## [1] 1514764800
+## attr(,&quot;tzone&quot;)
+## [1] &quot;Asia/Taipei&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>as.POSIXct(&quot;2018-01-01 00:00:00&quot;, tz = &quot;GMT&quot;) %&gt;% unclass()</pre>
+
+<pre >## [1] 1514764800
+## attr(,&quot;tzone&quot;)
+## [1] &quot;GMT&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>時區</h2></hgroup><article  id="section-70">
+
+<ul>
+<li>POSIXct: 與 格林威治時間<code>1970-01-01 00:00:00</code> (台北時間 <code>1970-01-01 08:00:00</code>)差距的秒數
+
+<ul>
+<li>台北時間 <code>2018-01-01 08:00:00</code> 與台北時間 <code>1970-01-01 08:00:00</code> 差 1514764800 秒</li>
+<li>格林威治時間 <code>2018-01-01 00:00:00</code> 與 格林威治時間 <code>1970-01-01 00:00:00</code> 也差 1514764800 秒</li>
+</ul></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>t &lt;- 1514764800
+class(t) &lt;- class(Sys.time())
+format(t)</pre>
+
+<pre >## [1] &quot;2018-01-01 08:00:00&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>format.POSIXct(t, tz = &quot;GMT&quot;) # S3</pre>
+
+<pre >## [1] &quot;2018-01-01&quot;</pre>
+
+</article></slide><slide class=""><hgroup><h2>時區</h2></hgroup><article  id="section-71">
+
+<ul>
+<li>沒有指定時區時，R 預設會用<code>Sys.timezone()</code></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>Sys.timezone()</pre>
+
+<pre >## [1] &quot;Asia/Taipei&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>as.POSIXct(&quot;1970-01-01 00:00:00&quot;) %&gt;% as.numeric()</pre>
+
+<pre >## [1] -28800</pre>
+
+</article></slide><slide class=""><hgroup><h2>時區</h2></hgroup><article  id="section-72">
+
+<ul>
+<li>指定時區</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>as.POSIXct(&quot;1970-01-01 00:00:00&quot;, tz = &quot;GMT&quot;) %&gt;% as.numeric()</pre>
+
+<pre >## [1] 0</pre>
+
+</article></slide><slide class=""><hgroup><h2>總結</h2></hgroup><article  id="section-73">
+
+<ul>
+<li>時間格式是以<code>numeric vector</code>的形式儲存
+
+<ul>
+<li>使用<code>class</code>修飾</li>
+</ul></li>
+<li>不同時區的時間，只要對應到相同的時間點，則儲存的數值應該相同
+
+<ul>
+<li>台北時間 <code>2018-01-01 08:00:00</code> 與 格林威治時間 <code>2018-01-01 00:00:00</code> 相同</li>
+</ul></li>
+<li>時區會影響到時間的數值與時間的文字之間的轉換
+
+<ul>
+<li><code>as.POSIXct</code>: 文字 —&gt; 數值</li>
+<li><code>format.POSIXct</code>: 數值 —&gt; 文字</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>轉換頻率</h2></hgroup><article  id="section-74">
+
+<pre class = 'prettyprint lang-r'># 分
+format(Sys.time(), &quot;%M&quot;) %&gt;% as.integer()</pre>
+
+<pre >## [1] 55</pre>
+
+<pre class = 'prettyprint lang-r'># 時
+format(Sys.time(), &quot;%H&quot;) %&gt;% as.integer()</pre>
+
+<pre >## [1] 2</pre>
+
+<pre class = 'prettyprint lang-r'># 日
+format(Sys.time(), &quot;%d&quot;) %&gt;% as.integer()</pre>
+
+<pre >## [1] 11</pre>
+
+</article></slide><slide class=""><hgroup><h2>轉換頻率</h2></hgroup><article  id="section-75">
+
+<pre class = 'prettyprint lang-r'># 月
+format(Sys.time(), &quot;%m&quot;) %&gt;% as.integer()</pre>
+
+<pre >## [1] 5</pre>
+
+<pre class = 'prettyprint lang-r'># 年
+format(Sys.time(), &quot;%Y&quot;) %&gt;% as.integer()</pre>
+
+<pre >## [1] 2019</pre>
+
+<pre class = 'prettyprint lang-r'># 季
+(format(Sys.time(), &quot;%m&quot;) %&gt;% as.integer() - 1) %/% 3</pre>
+
+<pre >## [1] 1</pre>
+
+<pre class = 'prettyprint lang-r'># try (1:12 - 1) %/% 3</pre>
+
+</article></slide><slide class=""><hgroup><h2>當時間的尺度不一致</h2></hgroup><article  id="section-76">
+
+<ul>
+<li>GDP是每年一次的資料 v.s. 房貸餘額是每月一次的資料
+
+<ul>
+<li>將房貸餘額加總成為GDP(但是房貸餘額能加總嘛？)</li>
+<li>找一個時間點的房貸餘額代表該年度的房貸餘額（要找幾月？）</li>
+</ul></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1854 @@
+---
+title: "結構化的資料處理"
+author: "Wush Wu"
+date: "`r Sys.Date()`"
+output: 
+  ioslides_presentation:
+    css:
+      - structured-data.css
+      - ../css/dsp.css
+      - ../css/style.css
+      - ../css/wush-custom.css
+    self_contained: no
+    widescreen: yes
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+fullimg.css <- new.env()
+fullimg <- function(path, symbol, dsr = TRUE) {
+  if (exists(symbol, envir = fullimg.css)) stop("Symbol collision")
+  if (dsr) fullimg.css[[symbol]] <- sprintf("https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s", path) else fullimg.css[[symbol]] <- path
+  sprintf(".fullimg .%s", symbol)
+}
+knitr::knit_hooks$set("document" = function(x) {
+  css <- sapply(ls(fullimg.css), function(symbol) {
+    sprintf("article.%s {\n  width : 100%%;\n  height : 80%%;\n  background : url(%s);\n  background-size : 100%% 100%%;}\n", symbol, fullimg.css[[symbol]])
+  })
+  write(css, file = "structured-data.css")
+  x
+})
+fig <- function(path, style = "max-width: 100%; max-height: 100%; ", dsr = TRUE) {
+  if (dsr) sprintf("<img src='https://raw.githubusercontent.com/wush978/DataScienceAndR/gh-pages/slide/assets/img/%s' style='%s'></img>", path, style) else sprintf("<img src='img/%s' style='%s'></img>", path, style)
+}
+library(magrittr)
+library(dplyr)
+library(diagram)
+if (Sys.info()["sysname"] == "Darwin") {
+  knitr::knit_hooks$set(chinese_font = function(before, options, envir) {
+    if (before) {
+      par(family = "黑體-繁 中黑")
+    }
+  })
+  knitr::opts_chunk$set(chinese_font = TRUE)
+}
+```
+
+## 大綱
+
+- 讀取CSV
+- `dplyr` 的Verbs簡介
+- 資料整合
+
+# 讀取CSV
+
+## CSV的格式
+
+- CSV: Comma-Separated Values
+
+`r fig("擷取選取區域_008.png", dsr = FALSE)`
+
+## `read.csv`
+
+```{r}
+read.csv("http://homepage.ntu.edu.tw/~wush978/rdataengineer/district_location.csv", 
+         header = TRUE, nrows = 6)
+```
+
+## `read.table`
+
+```{r}
+read.csv("http://homepage.ntu.edu.tw/~wush978/rdataengineer/district_location.csv", 
+         sep = ",", header = TRUE, nrows = 6)
+```
+
+## `read.csv`與`read.table`的注意事項
+
+- 預設會把`character vector`轉成`factor`型態
+    - 可以用參數`stringsAsFactors`控制
+- 實務上，R會猜欄位的型態（是`character`, `numeric`還是呢？），這很慢
+    - 可以用參數`colClasses`直接告訴R答案，讀大資料會快很多
+
+## 讀取`CSV`的可能錯誤：編碼問題
+
+```{r, error = TRUE, warning= TRUE}
+read.csv(url("http://homepage.ntu.edu.tw/~wush978/rdataengineer/district_location.csv", encoding = "BIG5"), 
+         sep = ",", header = TRUE, nrows = 6)
+```
+
+- 解法：先用`readLines`處理或是用`readBin`處理後再讀取
+
+## 讀取`CSV`的可能錯誤：欄位數量不一致
+
+- 內文包含`","`或分隔符號
+- 資料有錯
+
+```{r}
+read.csv("http://homepage.ntu.edu.tw/~wush978/rdataengineer/csv-error.csv")
+```
+
+- 用`readLines`後手動用`strsplit`處理
+
+## 小挑戰
+
+```{r}
+x <- readLines("http://homepage.ntu.edu.tw/~wush978/rdataengineer/csv-error.csv")
+```
+
+- 請用程式找出兩位的學號
+
+## 讀取CSV檔案的小撇步: colClasses 參數
+
+- `read.csv`與`read.table`
+- `colClasses`參數可以加速
+
+```{r, eval = FALSE}
+# source: https://support.spatialkey.com/spatialkey-sample-csv-data/
+path <- tempfile(fileext = ".csv.gz")
+download.file("http://homepage.ntu.edu.tw/~wush978/rdataengineer/FL_insurance_sample.csv.gz", destfile = path)
+```
+
+```{r, echo = FALSE}
+path <- "FL_insurance_sample.csv.gz"
+```
+
+## 讀取CSV檔案的小撇步: colClasses 參數
+
+```{r}
+readLines(gzfile(path), n = 6)
+system.time(
+  FL <- read.csv(gzfile(path), header = TRUE)
+)
+```
+
+## 讀取CSV檔案的小撇步: colClasses 參數
+
+```{r}
+system.time({
+  FL.head <- read.csv(gzfile("FL_insurance_sample.csv.gz"), header = TRUE, nrows = 6)
+  .col <- sapply(FL.head, class)
+  .col[.col == "integer"] <- "numeric"
+  FL <- read.csv(gzfile("FL_insurance_sample.csv.gz"), header = TRUE, colClasses = .col)
+})
+```
+
+## 讀取CSV檔案的小撇步: colClasses 參數
+
+```{r}
+head(FL)
+```
+
+## Database
+
+- 作業在 Windows 上的 3.5 系列有bug，修復中
+    - 請Windows使用者用別的版本的R跑作業
+- 什麼時候用 Database?
+    - 記憶體不夠
+    - 需要Transaction(多個操作中，只要一個失敗就全部復原)
+
+## Transaction
+
+- 線上的資料處理上，在「容錯」上非常重要的「特性」
+- 範例：
+    - 假設每小時產生一個檔案
+
+```r
+out.path <- sprintf("%s.csv", format(Sys.time(), "%Y-%m-%d-%H"))
+# do something
+write(data, file = out.path)
+```
+
+## Transaction
+
+- 線上的資料處理上，在「容錯」上非常重要的「特性」
+- 範例：
+    - 假設每小時產生一個檔案
+    - 寫入到一半的時候發生錯誤（斷電、當機）
+    - 自動重開機後又繼續跑，產生新的檔案
+    - 哪些檔案是錯的？
+
+## Transaction
+
+```r
+out.path <- format(Sys.time(), "%Y-%m-%d-%H.csv")
+out.path.tmp <- paste(out.path, "tmp", sep = ".")
+write(data, file = out.path.tmp)
+# rename is transaction
+file.rename(out.path.tmp, out.path)
+```
+
+## XML Tables
+
+- `XML::readHTMLTable`
+- `XML` 是比較老牌的XML處理工具
+    - 資料結構比`xml2`更難懂，但是比較穩(?)
+    - 如果資料來源是結構化的HTML表格，`XML::readHTMLTable`很方便
+
+## 2018 縣市長大選台北即時估票
+
+- [外差估票程式](https://gist.github.com/wush978/1619ddb3ed093a11febb0da592f5fc9d)
+    1. 從中選會的網頁上抓候選人的得票數
+    2. 利用各正區現有的得票率當機準，依照「已開票」與「未開票」的比率放大
+    3. 推估最終候選人的得票
+    4. 可惜現在網頁格式不一致，所以會跑出NA XD
+- [紀錄](https://www.facebook.com/wush978/posts/2194489713895986)
+
+## data.frame
+
+- 由list物件擴充而成
+    - list + attributes
+- 在R 語言中，處理「表格」(table)資料
+    - 表格 v.s. 矩陣、陣列
+- 視覺化：ggplot2
+- 許多進階分析的入口
+    - 例：迴歸分析(`lm`)
+    - 將表格的變數轉換成數學上的矩陣：`model.matrix`
+        $\hat{\beta} = (X^TX)^{-1}(X^Ty)$
+
+
+## data.frame 的 Create
+
+- 注意參數： `stringsAsFactors`
+
+```{r}
+data.frame(student.id = 1:5, math.score = rpois(5, 5))
+```
+
+## data.frame 的 Create
+
+```{r, cache = TRUE}
+df <- read.csv(
+  url("https://raw.githubusercontent.com/wush978/DataScienceAndR/course/01-RBasic-07-Loading-Dataset/A_LVR_LAND_A.CSV", encoding = "BIG5"), 
+  nrows = 6, header = TRUE)
+df[,1:3]
+```
+
+## data.frame 的 Read
+
+- list的Read: `[`、`[[`與`$`
+
+```{r}
+df["鄉鎮市區"]
+```
+
+## data.frame 的 Read
+
+- list的Read: `[`、`[[`與`$`
+
+```{r}
+df[["鄉鎮市區"]]
+```
+
+## data.frame 的 Read
+
+- list的Read: `[`、`[[`與`$`
+
+```{r}
+df$`鄉鎮市區`
+```
+
+## data.frame 的 Read
+
+- `[`: 仍然是data.frame
+- `[[`、`$`: data.frame(list)會被打破
+
+## data.frame 的 Read
+
+- matrix的Read: `[`
+
+```{r}
+df[1,1]
+df[1:2,1]
+df[1,1:2]
+```
+
+## data.frame 的 Read
+
+- matrix的Read: `[`
+    - 應仍然是data.frame
+    - 參數`drop = TRUE`(預設)當欄位方向的維度為1時，會自動把data.frame轉成向量
+
+```{r}
+df[1:2,1:2]
+df[1,1,drop = FALSE]
+```
+
+## data.frame 的 Read
+
+- `drop = TRUE` 是好事嘛？
+    - Hadley 主導的 [tidyverse](https://www.tidyverse.org/)
+    - 不是所有人都喜歡... [tibbles are not data.frames](https://stat.ethz.ch/pipermail/r-package-devel/2017q3/001896.html)
+
+## data.frame 的 Update
+
+- `Read` + `<-`
+
+<div class="columns-2">
+```{r}
+df <- data.frame(
+  id = 1:5, 
+  score = sample(1:10, 5, TRUE))
+df
+df$score <- scale(df$score)
+df
+```
+</div>
+
+## data.frame 的 Delete
+
+- 反向Read
+- Read + `<- NULL`
+
+<div class="columns-2">
+```{r}
+df[-1,] # df[2:5,]
+df$score <- NULL
+df
+```
+</div>
+
+## 範例
+
+- `iris`的資料中
+    - `Sepal.Length`的平均
+    - 各種`Species`的平均`Sepal.Length`
+    - 建立新的欄位：`std.Sepal.Length`是標準化後的`Sepal.Length`
+    - 建立新的欄位：`std.Sepal.Length`是依照個別`Species`作標準化後的`Sepal.Length`
+
+## 範例
+
+- 各種`Species`的平均`Sepal.Length`
+
+```{r}
+ans <- c()
+for(.sp in levels(iris$Species)) {
+  .i <- iris$Species == .sp
+  ans[.sp] <- mean(iris$Sepal.Length[.i])
+}
+ans
+```
+
+## 範例
+
+- 各種`Species`的平均`Sepal.Length`
+
+```{r}
+# you can use `lapply` and then `unlist`
+sapply(levels(iris$Species), function(.sp) {
+  .i <- iris$Species == .sp
+  mean(iris$Sepal.Length[.i])
+})
+```
+
+
+## 範例
+
+- 各種`Species`的平均`Sepal.Length`
+
+```{r}
+. <- split(iris, iris$Species)
+. <- lapply(., "[[", "Sepal.Length")
+sapply(., mean)
+```
+
+## 範例
+
+- 各種`Species`的平均`Sepal.Length`
+
+```{r}
+aggregate(Sepal.Length ~ Species, iris, mean)
+```
+
+- 要理解這段expression，同學需要學會：
+    - `formula object`
+    - Aggregation functions
+
+## 範例
+
+- 建立新的欄位：`std.Sepal.Length`是標準化後的`Sepal.Length`
+
+```{r}
+ans <- iris # to backup the original object, we modify after copying
+. <- iris$Sepal.Length - mean(iris$Sepal.Length)
+. <- . / sd(iris$Sepal.Length)
+ans$std.Sepal.Length <- .
+ans[c(1,2,51,52,101,102),6,drop=FALSE]
+```
+
+## 範例
+
+- 建立新的欄位：`std.Sepal.Length`是標準化後的`Sepal.Length`
+
+```{r}
+ans <- iris # to backup the original object, we modify after copying
+ans$std.Sepal.Length <- scale(iris$Sepal.Length)
+ans[c(1,2,51,52,101,102),6,drop=FALSE]
+```
+
+## 範例
+
+- 建立新的欄位：`std.Sepal.Length`是依照個別`Species`作標準化後的`Sepal.Length`
+
+```{r}
+. <- iris$Sepal.Length
+for(.sp in levels(iris$Species)) {
+  .i <- iris$Species == .sp
+  .[.i] <- scale(.[.i])
+}
+ans <- iris
+ans$std.Sepal.Length <- .
+ans[c(1,2,51,52,101,102),6,drop=FALSE]
+```
+
+## 範例
+
+- 建立新的欄位：`std.Sepal.Length`是依照個別`Species`作標準化後的`Sepal.Length`
+
+```{r}
+# This code will not work if the species is not ordered
+. <- lapply(levels(iris$Species), function(.sp) {
+  .i <- iris$Species == .sp
+  scale(iris$Sepal.Length[.i])
+})
+ans <- iris
+ans$std.Sepal.Length <- unlist(.)
+ans[c(1,2,51,52,101,102),6,drop=FALSE]
+```
+
+# [dplyr](https://cran.r-project.org/package=dplyr)
+
+## 參考SQL 資料庫系統對結構化資料的操作做設計
+
+- 一般企業儲存結構化資料的工具
+    - 儲存所有資料的工具
+    - Transaction: 操作要嘛成功，要嘛無效
+- SQL 資料庫的結構與操作是有數學代數在背後([Relational Algebra](https://en.wikipedia.org/wiki/Relational_algebra))
+- R的data.frame v.s. SQL 資料庫
+    - memory v.s. disk
+    - indexing
+    - column based v.s. row based
+- 一致的設計，讓同學可以透過`dplyr`的語法寫SQL
+    - 老師的經驗：比起用dplyr操作Database，還是直接寫 SQL 比較簡單... 但是可順便學SQL
+    - 有SQL經驗的同學可以快速上手R 的data.frame
+
+## dplyr 沒有完全相容於 data.frame
+
+- 有時候，輸出的table不再是data.frame
+    - 為了效能
+    - 為了設計
+    - 因為Hadley(?)
+- 有必要時可以使用`as.data.frame`
+
+## Single Table verbs
+
+- Read / Delete
+    - `filter`、`slice`
+    - `select`
+    - `sample_n`、`sample_frac`
+- Update
+    - `mutate`
+    - `arrange`
+- Others
+    - `summarise`
+    - `group_by`
+    - `do`
+
+## 針對列作篩選：filter 
+
+<div class="columns-2" style="font-size-adjust:0.4;">
+```{r}
+head(iris[iris$Sepal.Length > 3,1,drop=FALSE])
+```
+
+```{r}
+head(filter(iris, Sepal.Length > 3)[,1,drop=FALSE])
+```
+</div>
+
+## 針對列作篩選：filter 
+
+- 在`dplyr`的函數中，`iris$`可以被省略
+    - 解析順序：欄位名稱 --> 變數名稱
+- `filter`的第一個參數是要處理的data.frame物件
+    - 所有的`dplyr`函數都是這樣設計
+- `filter`的其他參數必須是一個布林向量，並且長度一致
+    - 所有的這類參數，都是`TRUE`的位置，才會回傳
+
+## 針對列作篩選：filter 
+
+```{r}
+head(filter(iris, Sepal.Length > 3, Sepal.Width < 3.5))
+```
+
+## 針對列作篩選：filter 
+
+```{r}
+head(filter(iris, Sepal.Length > 3, Sepal.Width < 3.5, Species == "versicolor"))
+```
+
+## 針對列作篩選：filter 
+
+```{r}
+a <- iris$Sepal.Length + iris$Sepal.Width
+head(filter(iris, Sepal.Length > 3, Sepal.Width < 3.5, a < 8))
+```
+
+## 針對列作篩選：slice
+
+```{r}
+slice(iris, 1:6)
+```
+
+
+## 針對列作抽樣：`sample_n`、`sample_frac`
+
+<div class="columns-2">
+```{r}
+sample_n(iris, 6)[,1,drop=FALSE]
+```
+
+```{r}
+sample_frac(iris, 0.04)[,1,drop=FALSE]
+```
+</div>
+
+## 針對欄位作篩選：select
+
+```{r}
+head(select(iris, Sepal.Length))
+```
+
+## 針對欄位作篩選：select
+
+```{r}
+head(select(iris, Sepal.Length, Sepal.Width))
+```
+
+## 針對欄位作篩選：select
+
+```{r}
+head(select(iris, starts_with("Sepal")))
+```
+
+## 針對欄位作篩選：select
+
+```{r}
+head(select(iris, Sepal.Length:Petal.Length))
+```
+
+## 針對欄位作篩選：select
+
+- 反向操作
+
+```{r}
+head(select(iris, -Sepal.Length))
+```
+
+## 針對欄位作篩選：select
+
+- rename
+
+```{r}
+head(select(iris, SL = Sepal.Length))
+```
+
+## 更改資料(向量化)
+
+- mutate
+
+```{r}
+head(mutate(iris, Sepal = mean(Sepal.Length + Sepal.Width)))
+```
+
+## 更改資料(向量化)
+
+- mutate
+
+```{r}
+head(mutate(iris, Sepal.Length = as.character(Sepal.Length)))
+```
+
+## Aggregation: summarise
+
+- 150 rows --> 1 row
+
+```{r}
+summarise(iris, mean(Sepal.Length))
+```
+
+## Aggregation: summarise
+
+- 150 rows --> 2 row? error
+
+```{r, error=TRUE}
+summarise(iris, range(Sepal.Length))
+```
+
+## Aggregation: do
+
+- 150 rows --> 2 row
+- `.` is `iris` here
+
+```{r, error=TRUE}
+do(iris, data.frame(rSL = range(.$Sepal.Length)))
+```
+
+## Aggregation的目的
+
+- why `summarise`?
+
+<div class="columns-2">
+```{r}
+summarise(iris, mean(Sepal.Length))[[1]]
+```
+
+```{r}
+mean(iris$Sepal.Length)
+```
+</div>
+
+- Because `summarise`/`do` recognize `group_by`
+
+## Aggregation: `group_by`
+
+- Default *group* is `iris`
+    - `mutate`/`summarise`/`do` apply the expressions to the `group`
+- We can split `iris` to several groups based on specific (categorical) variable
+    - `character` or `factor`
+
+```{r}
+group_by(iris, Species) # Nothing happens
+```
+
+## Aggregation: `group_by` + `summarise`
+
+```{r}
+. <- group_by(iris, Species)
+summarise(., mean(Sepal.Length))
+```
+
+## `filter` --> `group_by`
+
+```{r}
+.x1 <- filter(iris, Species == "setosa")
+summarise(.x1, mean(Sepal.Length))
+```
+
+## `filter` --> `group_by`
+
+```{r}
+.x1 <- filter(iris, Species == "setosa")
+.x2 <- filter(iris, Species == "versicolor")
+.x3 <- filter(iris, Species == "virginica")
+rbind(
+  summarise(.x1, mean(Sepal.Length)),
+  summarise(.x2, mean(Sepal.Length)),
+  summarise(.x3, mean(Sepal.Length))
+)
+```
+
+## Aggregation
+
+- 透過`group_by`把原本的data.frame切割成若干個groups
+- 之後的verbs會各自對個別的groups運作，一個group跑一次(會有多個data.frame)，最後再`rbind`成為單一的data.frame
+
+## Aggregation: `group_by` + `summarise`
+
+```{r}
+. <- group_by(iris, Species)
+summarise(., mean(Sepal.Length), mean(Sepal.Width))
+```
+
+## Aggregation: `group_by` + `summarise`
+
+- 結果的維度： `group 的數量` $\times$ ?
+    - ?是所有在資料中出現的組合的個數
+
+```{r}
+. <- group_by(iris, Species, floor(Petal.Length))
+summarise(., mean(Sepal.Length), mean(Sepal.Width))
+```
+
+## Aggregation: `group_by` + `do`
+
+```{r}
+. <- group_by(iris, Species)
+do(., data.frame(type = c("min", "max"), r1 = range(.$Sepal.Length), r2 = range(.$Sepal.Width)))
+```
+
+## Aggregation: `group_by` + `summarise`
+
+- 利用`browser`詳細了解`group_by`與`summarise`
+
+```{r, eval = FALSE}
+. <- group_by(iris, Species)
+summarise(., SL = {
+  browser()
+  mean(Sepal.Length)
+})
+```
+
+## Aggregation: `group_by` + `do`
+
+- 利用`browser`詳細了解`group_by`與`do`
+- 在中斷點(`Browser[1]>`之下)可檢閱變數`.`
+
+```{r, eval = FALSE}
+. <- group_by(iris, Species)
+do(., {
+  browser()
+  data.frame(r1 = range(Sepal.Length))
+})
+```
+
+## 小挑戰
+
+- 請嘗試用`dplyr`的函數，從`iris`的資料中計算：
+    - `Sepal.Length`的平均(`mean`)
+    - 各種`Species`的平均`Sepal.Length`(`mean`)
+    - 建立新的欄位：`std.Sepal.Length`是標準化後的`Sepal.Length`(`scale`)
+    - 建立新的欄位：`std.Sepal.Length`是依照個別`Species`作標準化後的`Sepal.Length`(`scale`)
+
+## 參考答案
+
+- 建立新的欄位：`std.Sepal.Length`是標準化後的`Sepal.Length`
+
+```{r}
+mutate(iris, std.Sepal.Length = scale(Sepal.Length))[c(1,2,51,52,101,102),4:6]
+```
+
+## 參考答案
+
+- 建立新的欄位：`std.Sepal.Length`是依照個別`Species`作標準化後的`Sepal.Length`
+
+```{r}
+. <- group_by(iris, Species)
+mutate(., std.Sepal.Length = scale(Sepal.Length))[c(1,2,51,52,101,102),4:6]
+```
+
+## 從`dplyr`到SQL
+
+- 每一個Single Table Verbs會對到SQL Keyword, Ex:
+    - `select` --> `SELECT`
+    - `filter` --> `WHERE`
+
+## 從`dplyr`到SQL
+
+<div class="columns-2">
+
+```{r}
+suppressPackageStartupMessages(
+  library(sqldf)
+  )
+sqldf("
+SELECT `Sepal.Length` FROM iris 
+WHERE Species = 'setosa' LIMIT 6"
+)
+```
+
+<br/>
+
+```{r}
+. <- filter(iris, Species == "setosa")
+. <- select(., Sepal.Length)
+slice(., 1:6)
+```
+
+</div>
+
+## 從`dplyr`到SQL
+
+- 同學仍然需要找機會學習SQL的expression規則
+    - SQL 在資料科學是比 R 還重要的存在
+    - 懂 dplyr 後學 SQL 的概念會很快，因為背後的設計相同（把那些verbs換個名詞而已）
+- SQL 和 GROUP BY 與 dplyr 的 group_by都是 aggregation functions
+    - 但是在R 中我們可以用中斷點作探索，更快的理解aggregation functions
+
+## 從`dplyr`到SQL
+
+```{r}
+suppressPackageStartupMessages(library(dbplyr))
+library(RSQLite)
+src <- src_sqlite(tempfile(fileext = ".db"), create = TRUE)
+copy_to(src, iris)
+iris.db <- tbl(src, "iris")
+filter(iris.db, Species == "versicolor")
+```
+
+## 從`dplyr`到SQL
+
+- aggregation 會受到 database 的限制
+
+```{r, error = TRUE}
+suppressPackageStartupMessages(library(dbplyr))
+library(RSQLite)
+src <- src_sqlite(tempfile(fileext = ".db"), create = TRUE)
+copy_to(src, iris)
+iris.db <- tbl(src, "iris")
+. <- group_by(iris.db, Species)
+do(., data.frame(r1 = range(.$Sepal.Length)))
+```
+
+# Table 的種類
+
+## Wide Table
+
+- row is an instance
+- columns are attributes
+
+```{r wide}
+df.wide <- data.frame(
+  id = c("Bob", "John", "Anderson"), 
+  math = c(80, 85, 90), 
+  science = c(75, 60, 100)
+  )
+df.wide
+```
+
+## Tall Table
+
+- 又稱為 narrow 或 stacked data 
+
+```{r tall, dependson="wide"}
+library(reshape2)
+df.tall <- melt(df.wide, variable.name = "subject", value.name = "score")
+df.tall
+```
+
+## Tall Table --> Wide Table (Pivoting)
+
+```{r, dependson="tall"}
+library(reshape2)
+dcast(df.tall, id ~ subject)
+# stats::reshape(df.tall, idvar = "id", 
+#   v.names = "score", timevar = "subject", 
+#   direction = "wide")
+```
+
+- wide table 在現實生活很常見，但是會有什麼問題呢？
+
+## wide table 的限制，以ggplot2為例
+
+- 在`df.wide`上比較math 或 science 很容易
+
+```{r wide.ggplot2, dependenson = "tall"}
+library(ggplot2)
+ggplot(df.wide, aes(x = id, y = math)) +
+  geom_bar(stat = "identity")
+```
+
+## wide table 的限制，以ggplot2為例
+
+- 但是怎麼同時比較 `math` 與 `science`?
+
+## 範例：ggplot2
+
+- ggplot2 is more friendly to tall table
+
+```{r tall.ggplot2, dependenson = "tall"}
+library(ggplot2)
+ggplot(df.tall, aes(x = id, y = score, fill = subject)) +
+  geom_bar(stat = "identity")
+```
+
+## Wide Table --> Tall Table
+
+```{r, eval = FALSE}
+library(reshape2)
+df.tall <- melt(df.wide, variable.name = "subject", value.name = "score")
+```
+
+## Wide Table --> Tall Table
+
+```{r}
+. <- iris
+.$id <- rownames(iris)
+iris.tall <- melt(
+  ., variable.name = "measurement", value.name = "value", 
+  id.vars = "id", stringsAsFactors = FALSE)
+filter(iris.tall, id == "1")
+```
+
+## Wide Table v.s. Tall Table
+
+- Wide Table 每一列要對應到一個instance
+- Tall Table 要有一個欄位（會重複）代表identity
+    - 相同的identity代表相同的instance
+- 我不知道對於這兩種table的嚴謹定義。實務上，也是有Table會介於兩者之間
+- 重點在於了解wide table與tall table適合使用的情境
+    - 必要時需要作轉型
+
+```{r, dependenson = "tall"}
+df.tall
+```
+
+## 小挑戰
+
+- 請問`iris`算是 wide table 還是 tall table?
+
+```{r}
+slice(iris, c(1, 2, 51, 52, 101, 102))
+```
+
+## 小挑戰
+
+- 請問`cars`算是 wide table 還是 tall table?
+
+```{r}
+cars
+```
+
+## Wide Table v.s. Tall Table
+
+- Wide Table的好處
+    - 比較容易閱讀、空間比較省
+    - 適合作aggregation
+    - 適合作modeling
+- Tall Table的好處
+    - 增加測量的類型時，不用對舊的資料造成破壞
+    - ggplot2
+
+## 對`iris`計算各個Species的平均
+
+```{r}
+. <- group_by(iris, Species)
+summarise_all(., mean)
+```
+
+
+## 對`iris.tall`計算各個Species的平均
+
+```{r}
+species <- filter(iris.tall, measurement == "Species")
+species <- unique(species$value)
+measurements <- unique(iris.tall$measurement)
+measurements <- as.character(measurements)
+measurements <- setdiff(measurements, "Species")
+result <- data.frame(
+  Species = species
+)
+for(m in measurements) {
+  result[[m]] <- numeric(nrow(result))
+}
+for(i in 1:length(species)) {
+  current.species <- filter(iris.tall, measurement == "Species", value == species[i])
+  #.$id
+  for(j in c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")) {
+    . <- filter(iris.tall, measurement == j, id %in% current.species$id)
+    result[[j]][i] <- mean(as.numeric(.$value))
+  }
+}
+```
+
+## 對`iris.tall`計算各個Species的平均
+
+```{r}
+. <- stats::reshape(
+  iris.tall, v.names = "value", 
+  timevar = "measurement", direction = "wide")
+. <- select(., value.Sepal.Length : value.Species)
+for(j in 1:4) {
+  .[[j]] <- as.numeric(.[[j]])
+}
+. <- group_by(., value.Species)
+summarise_all(., mean)
+```
+
+# pipeline operator
+
+## 資料處理就是一個連續組合動作
+
+```{r}
+. <- filter(iris, Species == "setosa")
+. <- select(., Sepal.Length)
+head(., 6)
+```
+
+## 運用中間變數
+
+- `.` 永遠是中間變數，不會混用
+    - 常見的還有`x`、`y`、`i`... 
+    - 但是中間變數的名字越多，越容易混淆
+
+```{r, eval = FALSE}
+for(i in ...) {
+  ...
+  for(i in ...) { # i is duplicated
+    ... 
+  }
+  ... # i has been changed
+}
+```
+
+
+## 解決辦法：保持environment的乾淨
+
+- 中間變數一律用`.`開頭
+    - 預設會隱藏這些變數
+- nested function call
+
+```{r}
+head(select(filter(iris, Species == "setosa"), Sepal.Length), 6)
+```
+
+## 解決辦法：pipeline operator `%>%`
+
+- `%>%`會把左邊的expression的結果，當成右邊函數呼叫的第一個參數
+    - 參數對應的方式：先比對名稱，再按照順序
+
+```{r}
+filter(iris, Species == "setosa") %>%
+  select(Sepal.Length) %>%
+  head(6)
+```
+
+## `%>%` 細解
+
+```{r}
+# . <- filter(iris, Species == "setosa")
+filter(iris, Species == "setosa") %>%
+# . <- select(., Sepal.Length)
+  select(Sepal.Length) %>%
+# head(., 6)
+  head(6)
+```
+
+## 範例
+
+```{r}
+# . <- group_by(iris, Species)
+group_by(iris, Species) %>%
+# . <- mutate(., std.Sepal.Length = scale(Sepal.Length))
+  mutate(std.Sepal.Length = scale(Sepal.Length)) %>%
+# .[,4:6]  
+  `[`(,4:6)
+```
+
+## `%>%` 與 `.`
+
+- `%>%`左邊的運算結果，可以在右邊的expression中以`.`變數呼叫
+
+```{r}
+sample(1:10) %>% paste0(LETTERS[.])
+# . <- sample(1:10)
+# paste0(., LETTERS[.])
+```
+
+## 挑戰
+
+- 同學可以嘗試用pipeline operator來寫出清理資料的程式
+    - 在思考上，會和過去的經驗不太相同
+    - 程式碼較容易閱讀與複製
+
+```r
+# 我們想要複製 `select(., Sepal.Length)` 之後 `head(., 6)`這兩個動作
+head(select(filter(iris, Species == "setosa"), Sepal.Length), 6)
+# --> 
+head(select(filter(iris, Species == "versicolor"), Sepal.Length), 6)
+filter(iris, Species == "setosa") %>%
+  select(Sepal.Length) %>%
+  head(6)
+# -->
+filter(iris, Species == "versicolor") %>%
+  select(Sepal.Length) %>%
+  head(6)
+```
+
+# 資料整合
+
+## 資料科學團隊
+
+1. Hello World: Dashboard
+    - 資料清理
+    - 檢查資料
+    - 確認分析的方向
+2. Next Step: 資料整合
+    - 有怎麼樣的整合是過去沒有人試過的？
+    - 分析資料就像是從水果（分析）中榨取果汁（價值）
+    - 從沒被榨取過得資料中獲得價值更容易
+
+`r fig("hK35aAi.jpg.gif", dsr = FALSE)`
+
+
+## 資料整合的挑戰
+
+- 考驗著公司的資料工程成熟度
+
+## 公司的資料工程等級
+
+### 沒有資料工程，就沒有資料科學
+
+1. Lv1: 有收集資料
+2. Lv2: 有即時的資料可以用
+3. Lv3: 有逐筆的資料可以用
+4. Lv4: 有建立即時模型(整合Lv2與Lv3)
+
+## Lv1: 有收集資料
+
+- 有在收集數據
+    - 工廠的感測器的數據
+    - 網站上使用者的行為紀錄
+    - 手機的訊號紀錄
+    - 網路裝置的訊號紀錄
+    - 顧客的購買紀錄
+    - 顧客的客訴紀錄
+
+## Lv1: 有收集資料，但是沒有處理資料的架構
+
+- 數據有（暫時地）儲存到硬碟
+- 若需要檢查過去的數據，概念上辦得到，但是實際取出需要很長的時間
+
+`r fig("Data-LV1.png", dsr = FALSE)`
+
+## Lv2: 有即時的資料可以用
+
+- 場區過去一小時的平均溫度
+- 使用者的點擊次數累計
+- 顧客的購買次數、購買金額
+
+## Lv2 實做
+
+- 若只要單純的功能，則不需要太大量的計算資源
+- 越要求穩定、可靠，則需要越多的資源
+- 可以做出Dashboard、可以跑統計、作趨勢的預測
+
+`r fig("Data-LV2.png", style = "max-width: 75%; max-height: 75%; ", dsr = FALSE)`
+
+## Lv2: 沒有存取歷史資料的架構
+
+- 若需要檢查過去的數據，但是實際取出需要很長的時間
+- 任何改動都需要時間累計、無法回朔
+- 沒辦法跑深度的分析
+- 通常由工程師兼差維護資料系統
+
+## Lv3: 有逐筆的資料可以用
+
+- 提供存取歷史數據的架構
+    - Hadoop
+    - Spark
+
+`r fig("640px-Mapreduce_Overview.svg.png", dsr = FALSE)`
+
+## Lv3: 有逐筆的資料可以用
+
+- 可以作大量數據的資料整合
+- 可以作線下的複雜模型分析、進行實驗
+- 由專職的團隊維護數據系統
+
+`r fig("Data-LV3.png", style = "max-width: 75%; max-height: 75%; ", dsr = FALSE)`
+
+## 資料工程之路
+
+- 程式之路：**功能**-->效能-->穩定
+- 資料工程的需求：有資料-->**能統計的資料**-->能整合的資料-->能分析的資料-->可靠的資料
+
+# dplyr two tables
+
+## nycflights13: Flights that Departed NYC in 2013
+
+```{r}
+library(nycflights13)
+data(flights)
+head(flights)
+# View(head(flights))
+```
+
+## nycflights13: Flights that Departed NYC in 2013
+
+- `?flights`可以看到個別欄位的說明
+
+## 航空公司的全名
+
+```{r}
+data(airlines)
+head(airlines)
+# View(airlines)
+```
+
+## 第一筆資料的航空公司全名
+
+```{r}
+flights$carrier[1]
+filter(airlines, carrier == flights$carrier[1])
+```
+
+## 第三筆資料的航空公司全名
+
+```{r}
+flights$carrier[3]
+filter(airlines, carrier == flights$carrier[3])
+```
+
+## 所有資料的航空公司全名
+
+- 對`flights`建立變數`name`代表該筆資料的航空公司名稱
+
+```{r}
+.i <- match(flights$carrier, airlines$carrier)
+stopifnot(flights$carrier == airlines$carrier[.i])
+flights2 <- flights
+flights2$name <- airlines$name[.i]
+```
+
+## 比對
+
+`r fig("flightsVSairlines.png", 50, dsr = FALSE)`
+
+## Key: `carrier`
+
+- 根據`carrier`的值，比對`flights`的資料與`airlines`的資料
+
+## 小練習
+
+- 請問各航空公司的起飛時間的平均延遲是？
+- 請問各航空公司的到達時間的平均延遲是？
+
+## 小練習
+
+- 直接作
+
+```{r}
+group_by(flights2, name) %>%
+  summarise(mean(dep_delay))
+```
+
+## 小練習
+
+- 處理`NA`
+
+```{r}
+mean(is.na(flights2$dep_delay))
+group_by(flights2, name) %>% 
+  summarise(mean(is.na(dep_delay)))
+```
+
+## 小練習
+
+- 移除`NA`
+
+```{r}
+group_by(flights2, name) %>% 
+  summarise(mean(dep_delay, na.rm = TRUE))
+```
+
+## `dplyr::left_join`
+
+```{r}
+data(flights)
+left_join(flights, airlines, by = "carrier")
+```
+
+## `dplyr::left_join`
+
+```{r}
+data(flights)
+left_join(flights, airlines)
+```
+
+## `dplyr::left_join`的參數
+
+```{r}
+args(dplyr::left_join)
+```
+
+## `dplyr::left_join`: `by`參數
+
+`r fig("flightsVSairlines.png", 50, dsr = FALSE)`
+
+
+## Key的重要性
+
+- 整合結構化資料時，最重要的就是要先找到（產生）共同的Key
+- 我個人實務上最常用的是`left_join`
+    - 資訊的黏貼
+
+
+## `y`上不唯一的Key
+
+```{r}
+head(flights) %>%
+  left_join(airlines) %>%
+  select(carrier, name)
+```
+
+## `y`上不唯一的Key
+
+```{r}
+head(flights) %>%
+  left_join(rbind(airlines, data.frame(carrier = "UA", name = "duplicated"))) %>%
+  select(carrier, name)
+```
+
+## 機場的天氣
+
+```{r}
+data(weather)
+head(weather)
+# View(weather)
+# ?weather
+```
+
+## 直接`left_join`
+
+```{r}
+left_join(flights, weather) %>%
+  head()
+```
+
+## `airports`
+
+```{r}
+data(airports)
+head(airports)
+# View(airports)
+# ?airports
+```
+
+## `airports`
+
+```{r}
+left_join(flights, airports, by = c("origin" = "faa")) %>%
+  head()
+```
+
+## `airports`
+
+- 同時整合起點與終點
+
+```{r}
+left_join(flights, airports, by = c("origin" = "faa")) %>%
+  left_join(airports, by = c("dest" = "faa")) %>%
+  colnames()
+```
+
+## `airports`
+
+- `suffix`參數
+
+```{r}
+left_join(flights, airports, by = c("origin" = "faa")) %>%
+  left_join(airports, by = c("dest" = "faa"), suffix = c(".origin", ".dest")) %>%
+  colnames()
+```
+
+## 小練習
+
+- 起飛機場的風速對抵達時間的延遲是不是有影響?
+
+## 小練習
+
+- 先看看風速與的抵達時間延遲的關係
+
+```{r}
+left_join(flights, weather) %>%
+  select(wind_speed, arr_delay)
+```
+
+## 小練習
+
+- 為什麼有`NA`? 是不是因為：有`weather`資料的地點不多？
+
+### 問資料
+
+```{r}
+table(flights$origin)
+table(weather$origin)
+```
+
+## 小練習
+
+- 是不是有`time_hour`欄位才導致`NA`？
+
+### 問資料
+
+```{r}
+select(flights, -time_hour) %>%
+  left_join(weather) %>%
+  select(wind_speed, arr_delay)
+```
+
+## 小練習
+
+- 是不是比對失敗導致`NA`?
+
+### 問資料
+
+```{r}
+select(flights, year, month, day, origin, hour, time_hour) %>%
+  slice(1)
+filter(weather, year == 2013, month == 1, day == 1, origin == "EWR", hour == 5., time_hour == flights$time_hour[1])
+```
+
+## 小練習
+
+- `weather`有漏失資料嘛？
+
+### 問資料
+
+```{r}
+filter(weather, year == 2013, month == 1, day == 1, origin == "EWR") %>%
+  arrange(hour) %>%
+  select(hour)
+```
+
+## 小練習
+
+- 假設掉資料的現象並沒有特別的模式 --> 拿掉`NA`
+
+```{r}
+left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay))
+```
+
+## 小練習
+
+- 畫圖
+
+```{r, eval = FALSE}
+left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  ggplot(aes(x = wind_speed, y = arr_delay)) +
+  geom_point()
+```
+
+## 小練習
+
+- 畫圖
+
+```{r, echo = FALSE}
+left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  ggplot(aes(x = wind_speed, y = arr_delay)) +
+  geom_point()
+```
+
+## 小練習
+
+- 那些`wind_speed`破千的是什麼意思？
+- 查詢`mph`的合理範圍： <https://en.wikipedia.org/wiki/Beaufort_scale>
+
+```{r}
+range(weather$wind_speed, na.rm = TRUE)
+```
+
+## 小練習
+
+- 拿掉 `wind_speed` 超過 1000 的資料後檢查`range`
+
+```{r}
+filter(weather, wind_speed < 1000) %>% 
+  do(data.frame(range = range(.$wind_speed)))
+```
+
+## 小練習
+
+- 重新畫圖
+
+```{r, eval = FALSE}
+left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000) %>%
+  ggplot(aes(x = wind_speed, y = arr_delay)) +
+  geom_point()
+```
+
+## 小練習
+
+- 重新畫圖
+
+```{r, echo = FALSE}
+left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000) %>%
+  ggplot(aes(x = wind_speed, y = arr_delay)) +
+  geom_point()
+```
+
+## 小練習
+
+- 分組後取平均
+
+```{r, eval = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+ggplot(.df, aes(x = wind_speed_group, y = arr_delay)) +
+  geom_boxplot()
+```
+
+## 小練習
+
+- 分組後取平均
+
+```{r, echo = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+ggplot(.df, aes(x = wind_speed_group, y = arr_delay)) +
+  geom_boxplot()
+```
+
+## 小練習
+
+- 分組後的分佈圖
+
+```{r, eval = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+ggplot(.df, aes(x = wind_speed_group, y = arr_delay)) +
+  geom_boxplot()
+```
+
+## 小練習
+
+- 分組後的分佈圖
+
+```{r, echo = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+ggplot(.df, aes(x = wind_speed_group, y = arr_delay)) +
+  geom_boxplot()
+```
+
+## 小練習
+
+- 直接取平均
+
+```{r, eval = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+group_by(.df, wind_speed_group) %>%
+  summarise(mean(arr_delay))
+```
+
+## 小練習
+
+- 直接取平均
+
+```{r, echo = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+group_by(.df, wind_speed_group) %>%
+  summarise(mean(arr_delay))
+```
+
+## 小練習
+
+- 去除邊界`10%`的資料後取平均
+
+```{r, eval = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+group_by(.df, wind_speed_group) %>%
+  summarise(mean(arr_delay, trim = 0.05))
+```
+
+## 小練習
+
+- 去除邊界`10%`的資料後取平均
+
+```{r, echo = FALSE}
+.df <- left_join(flights, weather) %>%
+  select(wind_speed, arr_delay) %>%
+  filter(!is.na(wind_speed), !is.na(arr_delay)) %>%
+  filter(wind_speed < 1000)
+.cut <- quantile(.df$wind_speed, seq(0, 1, 0.1))
+.df$wind_speed_group <- cut(.df$wind_speed, breaks = .cut, include.lowest = TRUE)
+group_by(.df, wind_speed_group) %>%
+  summarise(mean(arr_delay, trim = 0.05))
+```
+
+## 這些設定沒有標準答案
+
+- 一定要用`quantile`切割資料嘛？
+    - 一定要十組嘛？
+- 高手會調這些參數調到支持他們的論點
+- 新手會亂改數據造假
+
+`r fig("asset.jpg", style = "max-width: 50%; max-height: 50%; ", dsr = FALSE)`
+
+## 其他的`join`函數
+
+```{r, eval = FALSE}
+?left_join
+```
+
+## `left_join`
+
+<img src="http://i.imgur.com/K8EKfm4.png"/>
+
+## `left_join`
+
+- 兩個範例資料
+
+<div class="columns-2">
+```{r}
+band_members
+```
+```{r}
+band_instruments
+```
+</div>
+
+## `left_join`
+
+```{r}
+left_join(band_members, band_instruments)
+```
+
+## `right_join`
+
+<img src="https://i.imgur.com/ttI9e0s.png"/>
+
+## `right_join`
+
+```{r}
+right_join(band_members, band_instruments)
+```
+
+## `inner_join`
+
+<img src="https://i.imgur.com/4d64EXX.png"/>
+
+```{r}
+inner_join(band_members, band_instruments)
+```
+
+## `full_join`
+
+<img src="https://i.imgur.com/IHm04sD.png"/>
+
+## `full_join`
+
+```{r}
+full_join(band_members, band_instruments)
+```
+
+## `anti_join`
+
+<img src="https://i.imgur.com/QxcF0Fk.png"/>
+
+## `anti_join`
+
+```{r}
+anti_join(band_members, band_instruments)
+```
+
+## `semi_join`
+
+<img src="http://i.imgur.com/M2UF1mM.png"/>
+
+## `semi_join`
+
+```{r}
+semi_join(band_members, band_instruments)
+```
+
+- 當`y`的Key有重複時，`inner_join`會重複， `semi_join`不會
+
+
+# 時間資料的處理
+
+## Open Data上最常見於整合用的Key
+
+- 時間
+- 空間
+
+## 時間整合的挑戰
+
+- 時間格式不同
+- 時間頻率不同
+
+## 時間的格式: `format`
+
+```{r}
+Sys.time()
+format(Sys.time())
+format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+format(Sys.time(), "%Y%m%d%H%M%S")
+```
+
+## 時間的格式: `format`
+
+```r
+?format.POSIXct
+```
+
+- Details 中有如`%a`的格式說明
+- 我常用的
+    - `"%Y-%m-%d %H:%M:%S"` 年-月-日 小時-分鐘-秒數，並且固定數字的位數
+
+## 時間的格式: 實務上請愛用 [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) 
+
+- `"%Y-%m-%dT%H:%M:%SZ"`
+
+`r fig("what-is-your-idea-of-a-perfectdd-mm-yyyy-other-formats-date-36636391.png", style = "max-width: 80%; max-height: 80%; ", dsr = FALSE)`
+
+## R中的時間相關物件：`POSIXct`與`POSIXlt`
+
+```{r}
+Sys.time()
+class(Sys.time())
+strptime("2018-01-01 08:00:00", "%Y-%m-%d %H:%M:%S")
+strptime("2018-01-01 08:00:00", "%Y-%m-%d %H:%M:%S") %>% class()
+strptime("2018-01-01 08:00:00", "%Y-%m-%d %H:%M:%S") %>%
+  as.POSIXct()
+```
+
+## `POSIXct`的本質
+
+- 從某個時間點（預設是格林威治時間`1970-01-01 00:00:00`）開始到指定時間為止的秒數
+- numeric vector
+
+```{r}
+unclass(Sys.time())
+```
+
+## `POSIXlt`的本質
+
+- 分別紀錄年月日... 等資訊
+- list
+
+```{r}
+unclass(strptime("2018-01-01 08:00:00", "%Y-%m-%d %H:%M:%S"))
+```
+
+## 個人比較常用`POSIXct`
+
+- dplyr有支援`<dttm>`
+- 可以使用`as.POSIXct`
+- 從某個時間點（預設是格林威治時間`1970-01-01 00:00:00`）開始到指定時間為止的秒數
+- 與文字作轉換時要考慮時差、時區
+
+```{r}
+.t <- 0
+class(.t) <- class(Sys.time())
+.t # Our timezone is +8
+```
+
+## 時區
+
+- 我們要怎麼處理以下的時間：
+    - 台北時間 `2018-01-01 08:00:00`
+    - 格林威治時間 `2018-01-01 00:00:00`
+
+```{r}
+as.POSIXct("2018-01-01 08:00:00", tz = "Asia/Taipei") %>% unclass()
+as.POSIXct("2018-01-01 00:00:00", tz = "GMT") %>% unclass()
+```
+
+## 時區
+
+- POSIXct: 與 格林威治時間`1970-01-01 00:00:00` (台北時間 `1970-01-01 08:00:00`)差距的秒數
+    - 台北時間 `2018-01-01 08:00:00` 與台北時間 `1970-01-01 08:00:00` 差 1514764800 秒
+    - 格林威治時間 `2018-01-01 00:00:00` 與 格林威治時間 `1970-01-01 00:00:00` 也差 1514764800 秒
+
+```{r}
+t <- 1514764800
+class(t) <- class(Sys.time())
+format(t)
+format.POSIXct(t, tz = "GMT") # S3
+```
+
+## 時區
+
+- 沒有指定時區時，R 預設會用`Sys.timezone()`
+
+```{r}
+Sys.timezone()
+as.POSIXct("1970-01-01 00:00:00") %>% as.numeric()
+```
+
+## 時區
+
+- 指定時區
+
+```{r}
+as.POSIXct("1970-01-01 00:00:00", tz = "GMT") %>% as.numeric()
+```
+
+## 總結
+
+- 時間格式是以`numeric vector`的形式儲存
+    - 使用`class`修飾
+- 不同時區的時間，只要對應到相同的時間點，則儲存的數值應該相同
+    - 台北時間 `2018-01-01 08:00:00` 與 格林威治時間 `2018-01-01 00:00:00` 相同
+- 時區會影響到時間的數值與時間的文字之間的轉換
+    - `as.POSIXct`: 文字 ---> 數值
+    - `format.POSIXct`: 數值 ---> 文字
+
+## 轉換頻率
+
+```{r}
+# 分
+format(Sys.time(), "%M") %>% as.integer()
+# 時
+format(Sys.time(), "%H") %>% as.integer()
+# 日
+format(Sys.time(), "%d") %>% as.integer()
+```
+
+## 轉換頻率
+
+```{r}
+# 月
+format(Sys.time(), "%m") %>% as.integer()
+# 年
+format(Sys.time(), "%Y") %>% as.integer()
+# 季
+(format(Sys.time(), "%m") %>% as.integer() - 1) %/% 3
+# try (1:12 - 1) %/% 3
+```
+
+## 當時間的尺度不一致
+
+- GDP是每年一次的資料 v.s. 房貸餘額是每月一次的資料
+    - 將房貸餘額加總成為GDP(但是房貸餘額能加總嘛？)
+    - 找一個時間點的房貸餘額代表該年度的房貸餘額（要找幾月？）
+
+
+
